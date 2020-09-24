@@ -8,9 +8,30 @@ import FormLabel from '@material-ui/core/FormLabel';
 import Button from '@material-ui/core/Button';
 import PubSub from 'pubsub-js';
 import gql from 'graphql-tag';
-import { Typography } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { withLeaflet } from 'react-leaflet';
 import MeasureControlDefault from 'react-leaflet-measure';
+
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+}
 
 function _extends() {
   _extends = Object.assign || function (target) {
@@ -28,6 +49,40 @@ function _extends() {
   };
 
   return _extends.apply(this, arguments);
+}
+
+function ownKeys(object, enumerableOnly) {
+  var keys = Object.keys(object);
+
+  if (Object.getOwnPropertySymbols) {
+    var symbols = Object.getOwnPropertySymbols(object);
+    if (enumerableOnly) symbols = symbols.filter(function (sym) {
+      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+    });
+    keys.push.apply(keys, symbols);
+  }
+
+  return keys;
+}
+
+function _objectSpread2(target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i] != null ? arguments[i] : {};
+
+    if (i % 2) {
+      ownKeys(Object(source), true).forEach(function (key) {
+        _defineProperty(target, key, source[key]);
+      });
+    } else if (Object.getOwnPropertyDescriptors) {
+      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+      ownKeys(Object(source)).forEach(function (key) {
+        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+      });
+    }
+  }
+
+  return target;
 }
 
 function _taggedTemplateLiteral(strings, raw) {
@@ -195,34 +250,65 @@ var AdminSetting = function AdminSetting(props) {
   }, /*#__PURE__*/React.createElement(Form, null));
 };
 
-var Client = function Client(props) {
-  var LoadSetting = function LoadSetting() {
-    var _useQuery = useQuery(PLUGIN_SETTING_QUERY, {
-      variables: {
-        id: props.settingId
-      }
-    }),
-        data = _useQuery.data;
+var useStyles = makeStyles({
+  centerItem: {
+    display: 'flex',
+    padding: 15,
+    justifyContent: 'center'
+  },
+  root: {
+    width: '100%'
+  }
+});
+function ActionsInAccordionSummary() {
+  var classes = useStyles();
 
-    return /*#__PURE__*/React.createElement("div", {
-      style: {
-        padding: 10
-      }
-    }, /*#__PURE__*/React.createElement(Typography, {
-      variant: "subtitle2",
-      gutterBottom: true
-    }, "Measure distances and areas"), /*#__PURE__*/React.createElement(Button, {
-      variant: "contained",
-      onClick: function onClick() {
-        return PubSub.publish("start-measure");
-      }
-    }, "Measure"));
+  var _React$useState = React.useState({
+    createNew: false
+  }),
+      _React$useState2 = _slicedToArray(_React$useState, 2),
+      state = _React$useState2[0],
+      setState = _React$useState2[1];
+
+  var createNewSketch = function createNewSketch() {
+    setState(_objectSpread2(_objectSpread2({}, state), {}, {
+      createNew: true
+    }));
   };
 
-  return /*#__PURE__*/React.createElement(ApolloProvider, {
-    client: props.client
-  }, /*#__PURE__*/React.createElement(LoadSetting, null));
-};
+  return /*#__PURE__*/React.createElement("div", {
+    className: classes.root
+  }, /*#__PURE__*/React.createElement("div", {
+    className: classes.centerItem
+  }, /*#__PURE__*/React.createElement(Button, {
+    variant: "contained",
+    onClick: createNewSketch
+  }, "Create a sketch")), state.createNew ? /*#__PURE__*/React.createElement(Accordion, null, /*#__PURE__*/React.createElement(AccordionSummary, {
+    expandIcon: /*#__PURE__*/React.createElement(ExpandMoreIcon, null),
+    "aria-label": "Expand",
+    "aria-controls": "additional-actions1-content",
+    id: "additional-actions1-header"
+  }, /*#__PURE__*/React.createElement(TextField, {
+    onClick: function onClick(event) {
+      return event.stopPropagation();
+    },
+    onFocus: function onFocus(event) {
+      return event.stopPropagation();
+    },
+    id: "standard-full-width",
+    style: {
+      margin: 8
+    },
+    placeholder: "Placeholder",
+    fullWidth: true,
+    margin: "normal",
+    InputLabelProps: {
+      shrink: true
+    }
+  })), /*#__PURE__*/React.createElement(AccordionDetails, null, /*#__PURE__*/React.createElement(Typography, {
+    color: "textSecondary"
+  }, "The click event of the nested action will propagate up and expand the accordion unless you explicitly stop it."))) : null);
+}
 
 var MeasureControl = withLeaflet(MeasureControlDefault);
 
@@ -277,4 +363,4 @@ var MeasureTool = function MeasureTool(props) {
   }, /*#__PURE__*/React.createElement(LoadSetting, null));
 };
 
-export { AdminSetting, Client, MeasureTool };
+export { AdminSetting, ActionsInAccordionSummary as Client, MeasureTool };
