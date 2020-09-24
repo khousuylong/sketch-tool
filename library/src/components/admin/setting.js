@@ -7,7 +7,7 @@ import FormControl from '@material-ui/core/FormControl'
 import FormLabel from '@material-ui/core/FormLabel'
 import Button from '@material-ui/core/Button'
 import PubSub from 'pubsub-js'
-import {UPDATE_PLUGIN_SETTING_MUTATION, PLUGIN_SETTING_QUERY} from '../queries/pluginQuery'
+import {UPDATE_PLUGIN_SETTING_MUTATION, PLUGIN_SETTING_QUERY} from 'plugin-storage'
 
 const AdminSetting = (props) => {
   const [selectedValue, setSelectedValue] = React.useState('metric');

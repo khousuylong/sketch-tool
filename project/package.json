@@ -6,13 +6,17 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "npm-run-all": "^4.1.5",
+    "plugin-storage": "^1.0.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-leaflet-measure": "^2.1.1",
     "react-scripts": "3.4.3"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "json:server": "json-server --watch --host 0.0.0.0 --port 3006 data.json",
+    "serve": "react-scripts start",
+    "start": "npm-run-all -p serve json:server",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -41,6 +45,7 @@
     "axios": "^0.20.0",
     "graphql": "^15.3.0",
     "graphql-tools": "^4.0.6",
+    "json-server": "^0.16.1",
     "leaflet": "^1.7.1",
     "pubsub-js": "^1.9.0",
     "react-leaflet": "^2.7.0"

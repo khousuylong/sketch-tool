@@ -7,7 +7,7 @@ import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import Button from '@material-ui/core/Button';
 import PubSub from 'pubsub-js';
-import gql from 'graphql-tag';
+import { UPDATE_PLUGIN_SETTING_MUTATION as UPDATE_PLUGIN_SETTING_MUTATION$1 } from 'plugin-storage';
 import { makeStyles } from '@material-ui/core/styles';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
@@ -17,6 +17,7 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { withLeaflet } from 'react-leaflet';
 import MeasureControlDefault from 'react-leaflet-measure';
+import gql from 'graphql-tag';
 
 function _defineProperty(obj, key, value) {
   if (key in obj) {
@@ -153,28 +154,6 @@ function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
-function _templateObject2() {
-  var data = _taggedTemplateLiteral(["\n  mutation($id: ID!, $setting: String){\n    updatePluginSetting(id: $id, setting: $setting){\n      id\n      pluginId\n      setting\n    }\n  }\n"]);
-
-  _templateObject2 = function _templateObject2() {
-    return data;
-  };
-
-  return data;
-}
-
-function _templateObject() {
-  var data = _taggedTemplateLiteral(["\n  query PluginSettingQuery($id: ID!) {\n    pluginSetting(id: $id) {\n      id\n      pluginId\n      setting\n    }\n  }\n"]);
-
-  _templateObject = function _templateObject() {
-    return data;
-  };
-
-  return data;
-}
-var PLUGIN_SETTING_QUERY = gql(_templateObject());
-var UPDATE_PLUGIN_SETTING_MUTATION = gql(_templateObject2());
-
 var AdminSetting = function AdminSetting(props) {
   var _React$useState = React.useState('metric'),
       _React$useState2 = _slicedToArray(_React$useState, 2),
@@ -186,7 +165,7 @@ var AdminSetting = function AdminSetting(props) {
   };
 
   var Form = function Form() {
-    var _useMutation = useMutation(UPDATE_PLUGIN_SETTING_MUTATION),
+    var _useMutation = useMutation(UPDATE_PLUGIN_SETTING_MUTATION$1),
         _useMutation2 = _slicedToArray(_useMutation, 1),
         saveSetting = _useMutation2[0];
 
@@ -309,6 +288,28 @@ function ActionsInAccordionSummary() {
     color: "textSecondary"
   }, "The click event of the nested action will propagate up and expand the accordion unless you explicitly stop it."))) : null);
 }
+
+function _templateObject2() {
+  var data = _taggedTemplateLiteral(["\n  mutation($id: ID!, $setting: String){\n    updatePluginSetting(id: $id, setting: $setting){\n      id\n      pluginId\n      setting\n    }\n  }\n"]);
+
+  _templateObject2 = function _templateObject2() {
+    return data;
+  };
+
+  return data;
+}
+
+function _templateObject() {
+  var data = _taggedTemplateLiteral(["\n  query PluginSettingQuery($id: ID!) {\n    pluginSetting(id: $id) {\n      id\n      pluginId\n      setting\n    }\n  }\n"]);
+
+  _templateObject = function _templateObject() {
+    return data;
+  };
+
+  return data;
+}
+var PLUGIN_SETTING_QUERY = gql(_templateObject());
+var UPDATE_PLUGIN_SETTING_MUTATION = gql(_templateObject2());
 
 var MeasureControl = withLeaflet(MeasureControlDefault);
 

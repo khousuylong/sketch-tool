@@ -26,7 +26,8 @@
     "graphql-tools": "^4.0.6",
     "leaflet": "^1.7.1",
     "react-leaflet": "^2.7.0",
-    "react-leaflet-measure": "^2.1.1"
+    "react-leaflet-measure": "^2.1.1",
+		"plugin-storage": "^1.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",

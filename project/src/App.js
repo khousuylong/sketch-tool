@@ -10,12 +10,8 @@ import {resolvers} from './schema/resolvers'
 import AppMap from './map'
 import SwipeableTemporaryDrawer from './drawer'
 import SettingDrawer from './settingDrawer'
+import {client} from 'plugin-storage';
 import './App.css';
-
-const schema = makeExecutableSchema({
-  typeDefs,
-  resolvers
-});
 
 const styles = theme => ({
   container: {
@@ -24,11 +20,6 @@ const styles = theme => ({
     minWidth: '300px',
     marginTop: '20px'
   }
-});
-
-const client = new ApolloClient({
-  link: new SchemaLink({ schema }),
-  cache: new InMemoryCache()
 });
 
 class App extends React.Component {
