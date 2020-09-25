@@ -198,6 +198,7 @@ var useStyles = makeStyles({
 });
 function ActionsInAccordionSummary(props) {
   var classes = useStyles();
+  var pluginStorages;
 
   var _React$useState = React.useState({
     createNew: false
@@ -221,7 +222,7 @@ function ActionsInAccordionSummary(props) {
         data = _useQuery.data;
 
     if (data) {
-      console.log('data', data);
+      pluginStorages = data.pluginStorages;
       return /*#__PURE__*/React.createElement(Paper, {
         style: {
           overflow: 'auto'
@@ -268,10 +269,6 @@ function ActionsInAccordionSummary(props) {
         createStorage = _useMutation2[0],
         data = _useMutation2[1].data;
 
-    if (data) {
-      console.log('this is data', data); //setState({storage: data.createPluginStorage})
-    }
-
     return /*#__PURE__*/React.createElement(Button, {
       variant: "contained",
       onClick: function onClick() {
@@ -287,7 +284,13 @@ function ActionsInAccordionSummary(props) {
               pluginId: props.pluginId,
               json: JSON.stringify(jsonPayload)
             }
-          }
+          },
+          refetchQueries: [{
+            query: PLUGIN_STORAGES_QUERY,
+            variables: {
+              pluginId: props.pluginId
+            }
+          }]
         });
       }
     }, "Create storage");
