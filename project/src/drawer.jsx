@@ -44,41 +44,15 @@ const SwipeableTemporaryDrawer = function(props) {
     setState({ ...state, [anchor]: open });
   };
 
-	/*
-	const Plugins = () => {
-		const { loading, error, data } = useQuery(PLUGINS_QUERY)
-		if (loading) return(
-			<div style={{height: 200}}>
-				<Spinner />
-			</div>
-		);
-		if (error) console.log('this is error', error);
-
-		return(
-			<div className={clsx(classes.fullList)}>
-				{
-					data.plugins.map(plugin=>{
-						if(plugin.active){
-							return <Plugin key={plugin.name} data={plugin}/>
-						}
-						return null
-					})
-				}
-			</div>
-		)
-	}
-	*/
-
 	const list = (anchor) => (
     <div
       className={clsx(classes.list)}
       role="presentation"
     >
-			<Client client={props.client} settingId="b67635cc-cb47-4aaf-b37b-42e470acfef3"/>
+			<Client client={props.client} pluginId="869a172a-1026-458d-8c6b-89590d16b5d5" settingId="b67635cc-cb47-4aaf-b37b-42e470acfef3"/>
     </div>
   );
 	
-			//<Plugins />
 	const anchor = 'left';
 
   return (

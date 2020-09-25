@@ -7,32 +7,19 @@ import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import Button from '@material-ui/core/Button';
 import PubSub from 'pubsub-js';
-import { UPDATE_PLUGIN_SETTING_MUTATION as UPDATE_PLUGIN_SETTING_MUTATION$1 } from 'plugin-storage';
+import { UPDATE_PLUGIN_SETTING_MUTATION as UPDATE_PLUGIN_SETTING_MUTATION$1, PLUGIN_STORAGES_QUERY, CREATE_PLUGIN_STORAGE_MUTATION } from 'plugin-storage';
 import { makeStyles } from '@material-ui/core/styles';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import TextField from '@material-ui/core/TextField';
+import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { v4 } from 'uuid';
 import { withLeaflet } from 'react-leaflet';
 import MeasureControlDefault from 'react-leaflet-measure';
 import gql from 'graphql-tag';
-
-function _defineProperty(obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-}
 
 function _extends() {
   _extends = Object.assign || function (target) {
@@ -50,40 +37,6 @@ function _extends() {
   };
 
   return _extends.apply(this, arguments);
-}
-
-function ownKeys(object, enumerableOnly) {
-  var keys = Object.keys(object);
-
-  if (Object.getOwnPropertySymbols) {
-    var symbols = Object.getOwnPropertySymbols(object);
-    if (enumerableOnly) symbols = symbols.filter(function (sym) {
-      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
-    });
-    keys.push.apply(keys, symbols);
-  }
-
-  return keys;
-}
-
-function _objectSpread2(target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i] != null ? arguments[i] : {};
-
-    if (i % 2) {
-      ownKeys(Object(source), true).forEach(function (key) {
-        _defineProperty(target, key, source[key]);
-      });
-    } else if (Object.getOwnPropertyDescriptors) {
-      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
-    } else {
-      ownKeys(Object(source)).forEach(function (key) {
-        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
-      });
-    }
-  }
-
-  return target;
 }
 
 function _taggedTemplateLiteral(strings, raw) {
@@ -236,10 +189,14 @@ var useStyles = makeStyles({
     justifyContent: 'center'
   },
   root: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    position: 'absolute',
     width: '100%'
   }
 });
-function ActionsInAccordionSummary() {
+function ActionsInAccordionSummary(props) {
   var classes = useStyles();
 
   var _React$useState = React.useState({
@@ -248,45 +205,101 @@ function ActionsInAccordionSummary() {
       _React$useState2 = _slicedToArray(_React$useState, 2),
       state = _React$useState2[0],
       setState = _React$useState2[1];
+  /*
+  const createNewSketch = () => {
+    setState({ ...state, createNew: true });
+  }
+  */
 
-  var createNewSketch = function createNewSketch() {
-    setState(_objectSpread2(_objectSpread2({}, state), {}, {
-      createNew: true
-    }));
+
+  var RenderSketches = function RenderSketches() {
+    var _useQuery = useQuery(PLUGIN_STORAGES_QUERY, {
+      variables: {
+        pluginId: props.pluginId
+      }
+    }),
+        data = _useQuery.data;
+
+    if (data) {
+      console.log('data', data);
+      return /*#__PURE__*/React.createElement(Paper, {
+        style: {
+          overflow: 'auto'
+        }
+      }, data.pluginStorages.map(function (storage) {
+        var json = JSON.parse(storage.json);
+        return /*#__PURE__*/React.createElement(Accordion, {
+          key: storage.id
+        }, /*#__PURE__*/React.createElement(AccordionSummary, {
+          expandIcon: /*#__PURE__*/React.createElement(ExpandMoreIcon, null),
+          "aria-label": "Expand",
+          "aria-controls": "additional-actions1-content",
+          id: "additional-actions1-header"
+        }, /*#__PURE__*/React.createElement(TextField, {
+          onClick: function onClick(event) {
+            return event.stopPropagation();
+          },
+          onFocus: function onFocus(event) {
+            return event.stopPropagation();
+          },
+          id: "standard-full-width",
+          style: {
+            margin: 8
+          },
+          value: json.name,
+          placeholder: "Placeholder",
+          fullWidth: true,
+          margin: "normal",
+          InputLabelProps: {
+            shrink: true
+          }
+        })), /*#__PURE__*/React.createElement(AccordionDetails, null, /*#__PURE__*/React.createElement(Typography, {
+          color: "textSecondary"
+        }, "The click event of the nested action will propagate up and expand the accordion unless you explicitly stop it.")));
+      }));
+    }
+
+    return null;
   };
 
-  return /*#__PURE__*/React.createElement("div", {
+  var NewSketch = function NewSketch() {
+    var _useMutation = useMutation(CREATE_PLUGIN_STORAGE_MUTATION),
+        _useMutation2 = _slicedToArray(_useMutation, 2),
+        createStorage = _useMutation2[0],
+        data = _useMutation2[1].data;
+
+    if (data) {
+      console.log('this is data', data); //setState({storage: data.createPluginStorage})
+    }
+
+    return /*#__PURE__*/React.createElement(Button, {
+      variant: "contained",
+      onClick: function onClick() {
+        var jsonPayload = {
+          'name': 'Untitled sketch',
+          'description': '',
+          'geoJson': ''
+        };
+        createStorage({
+          variables: {
+            input: {
+              id: v4(),
+              pluginId: props.pluginId,
+              json: JSON.stringify(jsonPayload)
+            }
+          }
+        });
+      }
+    }, "Create storage");
+  };
+
+  return /*#__PURE__*/React.createElement(ApolloProvider, {
+    client: props.client
+  }, /*#__PURE__*/React.createElement("div", {
     className: classes.root
   }, /*#__PURE__*/React.createElement("div", {
     className: classes.centerItem
-  }, /*#__PURE__*/React.createElement(Button, {
-    variant: "contained",
-    onClick: createNewSketch
-  }, "Create a sketch")), state.createNew ? /*#__PURE__*/React.createElement(Accordion, null, /*#__PURE__*/React.createElement(AccordionSummary, {
-    expandIcon: /*#__PURE__*/React.createElement(ExpandMoreIcon, null),
-    "aria-label": "Expand",
-    "aria-controls": "additional-actions1-content",
-    id: "additional-actions1-header"
-  }, /*#__PURE__*/React.createElement(TextField, {
-    onClick: function onClick(event) {
-      return event.stopPropagation();
-    },
-    onFocus: function onFocus(event) {
-      return event.stopPropagation();
-    },
-    id: "standard-full-width",
-    style: {
-      margin: 8
-    },
-    placeholder: "Placeholder",
-    fullWidth: true,
-    margin: "normal",
-    InputLabelProps: {
-      shrink: true
-    }
-  })), /*#__PURE__*/React.createElement(AccordionDetails, null, /*#__PURE__*/React.createElement(Typography, {
-    color: "textSecondary"
-  }, "The click event of the nested action will propagate up and expand the accordion unless you explicitly stop it."))) : null);
+  }, /*#__PURE__*/React.createElement(NewSketch, null)), /*#__PURE__*/React.createElement(RenderSketches, null)));
 }
 
 function _templateObject2() {

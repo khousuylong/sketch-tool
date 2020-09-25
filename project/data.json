@@ -28,69 +28,9 @@
   ],
   "pluginStorages": [
     {
-      "id": "4a4af-b137b-22acfef3",
+      "id": "473d1c89-5c9f-456b-9aae-d3d6b5c405ad",
       "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": ""
-    },
-    {
-      "id": "cdd36787-223c-4e61-b117-6c52b255807b",
-      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"foo\":\"foo\"}"
-    },
-    {
-      "id": "f1fc8890-eaeb-41f2-8cc8-4dabca5bb2d5",
-      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"foo\":\"foo\"}"
-    },
-    {
-      "id": "a5d9d467-6cc9-4e86-a0d1-be6e1b4c906e",
-      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"foo\":\"bar\"}"
-    },
-    {
-      "id": "9658ff85-c11a-4dbb-bc2f-321c6b51da81",
-      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"foo\":\"bar\"}"
-    },
-    {
-      "id": "d9b752eb-c3b4-4d33-b7fe-8a876aeff1cd",
-      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"foo\":\"bar\"}"
-    },
-    {
-      "id": "9bf7954d-22ca-42b8-8318-4cf1c04fdaae",
-      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"foo\":\"bar\"}"
-    },
-    {
-      "id": "c3e277a9-fbcc-45ab-a2a9-be2ccaf187d6",
-      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"foo\":\"foo\"}"
-    },
-    {
-      "id": "14a97665-18b0-4326-863e-a8b93164a5f2",
-      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"foo\":\"foo\"}"
-    },
-    {
-      "id": "b11a80d4-12c0-4443-8446-fb482678364f",
-      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"foo\":\"foo\"}"
-    },
-    {
-      "id": "7ddf5300-108a-4306-8415-7fe6c4d26f99",
-      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"foo\":\"foo\"}"
-    },
-    {
-      "id": "9be6d6cc-1ddc-4da8-b0de-e43aa1aa714f",
-      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"foo\":\"bar\"}"
-    },
-    {
-      "id": "ff1a7d8c-94bb-467c-a286-344c2f68544a",
-      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"foo\":\"foo\"}"
+      "json": "{\"name\":\"Untitled sketch\",\"description\":\"\",\"geoJson\":\"\"}"
     }
   ]
 }
