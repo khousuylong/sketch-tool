@@ -7,14 +7,14 @@ import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import Button from '@material-ui/core/Button';
 import PubSub from 'pubsub-js';
-import { UPDATE_PLUGIN_SETTING_MUTATION as UPDATE_PLUGIN_SETTING_MUTATION$1, UPDATE_PLUGIN_STORAGE_MUTATION, PLUGIN_STORAGES_QUERY, CREATE_PLUGIN_STORAGE_MUTATION } from 'plugin-storage';
+import { UPDATE_PLUGIN_SETTING_MUTATION as UPDATE_PLUGIN_SETTING_MUTATION$1, UPDATE_PLUGIN_STORAGE_MUTATION, PLUGIN_STORAGES_QUERY, DELETE_PLUGIN_STORAGE_MUTATION, CREATE_PLUGIN_STORAGE_MUTATION } from 'plugin-storage';
 import { makeStyles } from '@material-ui/core/styles';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
+import '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { v4 } from 'uuid';
 import { withLeaflet } from 'react-leaflet';
@@ -221,6 +221,46 @@ var Sketch = /*#__PURE__*/memo(function (props) {
     }, 500);
   };
 
+  var DeleteSketch = function DeleteSketch() {
+    var _props$client$readQue = props.client.readQuery({
+      query: PLUGIN_STORAGES_QUERY,
+      variables: {
+        pluginId: props.data.pluginId
+      }
+    }),
+        pluginStorages = _props$client$readQue.pluginStorages;
+
+    var _useMutation3 = useMutation(DELETE_PLUGIN_STORAGE_MUTATION),
+        _useMutation4 = _slicedToArray(_useMutation3, 2),
+        deleteSketch = _useMutation4[0],
+        data = _useMutation4[1].data;
+
+    if (data) {
+      props.client.writeQuery({
+        query: PLUGIN_STORAGES_QUERY,
+        variables: {
+          pluginId: props.data.pluginId
+        },
+        data: {
+          pluginStorages: pluginStorages.filter(function (storage) {
+            return storage.id !== data.deletePluginStorage.id;
+          })
+        }
+      });
+    }
+
+    return /*#__PURE__*/React.createElement(Button, {
+      variant: "contained",
+      onClick: function onClick() {
+        deleteSketch({
+          variables: {
+            id: props.data.id
+          }
+        });
+      }
+    }, "Delete Sketch");
+  };
+
   return /*#__PURE__*/React.createElement(Accordion, null, /*#__PURE__*/React.createElement(AccordionSummary, {
     expandIcon: /*#__PURE__*/React.createElement(ExpandMoreIcon, null),
     "aria-label": "Expand",
@@ -245,9 +285,7 @@ var Sketch = /*#__PURE__*/memo(function (props) {
     InputLabelProps: {
       shrink: true
     }
-  })), /*#__PURE__*/React.createElement(AccordionDetails, null, /*#__PURE__*/React.createElement(Typography, {
-    color: "textSecondary"
-  }, "The click event of the nested action will propagate up and expand the accordion unless you explicitly stop it.")));
+  })), /*#__PURE__*/React.createElement(AccordionDetails, null, /*#__PURE__*/React.createElement(DeleteSketch, null)));
 });
 
 var useStyles = makeStyles({
@@ -335,7 +373,7 @@ function ActionsInAccordionSummary(props) {
           }
         });
       }
-    }, "Create storage");
+    }, "Create sketch");
   };
 
   return /*#__PURE__*/React.createElement(ApolloProvider, {
