@@ -28,57 +28,12 @@
   ],
   "pluginStorages": [
     {
-      "id": "473d1c89-5c9f-456b-9aae-d3d6b5c405ad",
+      "id": "9288426d-6858-4232-a9dd-91f1bb066187",
       "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"name\":\"Untitled sketch\",\"description\":\"\",\"geoJson\":\"\"}"
+      "json": "{\"name\":\"Untitled sketch updated\",\"description\":\"\",\"geoJson\":\"\"}"
     },
     {
-      "id": "f041c9d3-cabd-4a11-b9df-a88955b0f1ed",
-      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"name\":\"Untitled sketch\",\"description\":\"\",\"geoJson\":\"\"}"
-    },
-    {
-      "id": "6bb5252a-c165-4f3c-8706-baa892483f96",
-      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"name\":\"Untitled sketch\",\"description\":\"\",\"geoJson\":\"\"}"
-    },
-    {
-      "id": "f3140f1b-5ab1-4d0c-952f-c1db4705b9de",
-      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"name\":\"Untitled sketch\",\"description\":\"\",\"geoJson\":\"\"}"
-    },
-    {
-      "id": "70063eb0-d0ba-4207-b06f-4e69a0269af5",
-      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"name\":\"Untitled sketch\",\"description\":\"\",\"geoJson\":\"\"}"
-    },
-    {
-      "id": "35cae571-3407-433f-978c-df699e4bf1f6",
-      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"name\":\"Untitled sketch\",\"description\":\"\",\"geoJson\":\"\"}"
-    },
-    {
-      "id": "8360d89d-67f3-4bd7-be3c-2c0b5b12073d",
-      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"name\":\"Untitled sketch\",\"description\":\"\",\"geoJson\":\"\"}"
-    },
-    {
-      "id": "2773d4f8-0b86-4efd-be05-5093f5ca80d2",
-      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"name\":\"Untitled sketch\",\"description\":\"\",\"geoJson\":\"\"}"
-    },
-    {
-      "id": "7d9441a1-79b2-464e-b884-d1b192c4991a",
-      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"name\":\"Untitled sketch\",\"description\":\"\",\"geoJson\":\"\"}"
-    },
-    {
-      "id": "14a3ae3e-87d3-4a44-9cae-23b490601abc",
-      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"name\":\"Untitled sketch\",\"description\":\"\",\"geoJson\":\"\"}"
-    },
-    {
-      "id": "91430354-cef4-4b72-a274-a3060cdc06a4",
+      "id": "a6539368-23de-4a0f-99c7-6e4dda32dd1b",
       "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
       "json": "{\"name\":\"Untitled sketch\",\"description\":\"\",\"geoJson\":\"\"}"
     }

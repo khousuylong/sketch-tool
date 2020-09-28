@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { ApolloProvider, useMutation, useQuery } from '@apollo/client';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
@@ -7,7 +7,7 @@ import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import Button from '@material-ui/core/Button';
 import PubSub from 'pubsub-js';
-import { UPDATE_PLUGIN_SETTING_MUTATION as UPDATE_PLUGIN_SETTING_MUTATION$1, PLUGIN_STORAGES_QUERY, CREATE_PLUGIN_STORAGE_MUTATION } from 'plugin-storage';
+import { UPDATE_PLUGIN_SETTING_MUTATION as UPDATE_PLUGIN_SETTING_MUTATION$1, UPDATE_PLUGIN_STORAGE_MUTATION, PLUGIN_STORAGES_QUERY, CREATE_PLUGIN_STORAGE_MUTATION } from 'plugin-storage';
 import { makeStyles } from '@material-ui/core/styles';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
@@ -55,8 +55,20 @@ function _slicedToArray(arr, i) {
   return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
 }
 
+function _toConsumableArray(arr) {
+  return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
+}
+
+function _arrayWithoutHoles(arr) {
+  if (Array.isArray(arr)) return _arrayLikeToArray(arr);
+}
+
 function _arrayWithHoles(arr) {
   if (Array.isArray(arr)) return arr;
+}
+
+function _iterableToArray(iter) {
+  if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter);
 }
 
 function _iterableToArrayLimit(arr, i) {
@@ -101,6 +113,10 @@ function _arrayLikeToArray(arr, len) {
   for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
 
   return arr2;
+}
+
+function _nonIterableSpread() {
+  throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
 function _nonIterableRest() {
@@ -182,6 +198,58 @@ var AdminSetting = function AdminSetting(props) {
   }, /*#__PURE__*/React.createElement(Form, null));
 };
 
+var Sketch = /*#__PURE__*/memo(function (props) {
+  var _useMutation = useMutation(UPDATE_PLUGIN_STORAGE_MUTATION),
+      _useMutation2 = _slicedToArray(_useMutation, 2),
+      updateStorage = _useMutation2[0],
+      data = _useMutation2[1].data;
+
+  var json = JSON.parse(props.data.json);
+  var timer = null;
+
+  var handleTextChange = function handleTextChange(evt) {
+    var value = evt.target.value;
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(function () {
+      json['name'] = value;
+      updateStorage({
+        variables: {
+          id: props.data.id,
+          json: JSON.stringify(json)
+        }
+      });
+    }, 500);
+  };
+
+  return /*#__PURE__*/React.createElement(Accordion, null, /*#__PURE__*/React.createElement(AccordionSummary, {
+    expandIcon: /*#__PURE__*/React.createElement(ExpandMoreIcon, null),
+    "aria-label": "Expand",
+    "aria-controls": "additional-actions1-content",
+    id: "additional-actions1-header"
+  }, /*#__PURE__*/React.createElement(TextField, {
+    onClick: function onClick(event) {
+      return event.stopPropagation();
+    },
+    onFocus: function onFocus(event) {
+      return event.stopPropagation();
+    },
+    id: "standard-full-width",
+    style: {
+      margin: 8
+    },
+    onChange: handleTextChange,
+    defaultValue: json.name,
+    placeholder: "Placeholder",
+    fullWidth: true,
+    margin: "normal",
+    InputLabelProps: {
+      shrink: true
+    }
+  })), /*#__PURE__*/React.createElement(AccordionDetails, null, /*#__PURE__*/React.createElement(Typography, {
+    color: "textSecondary"
+  }, "The click event of the nested action will propagate up and expand the accordion unless you explicitly stop it.")));
+});
+
 var useStyles = makeStyles({
   centerItem: {
     display: 'flex',
@@ -199,19 +267,11 @@ var useStyles = makeStyles({
 function ActionsInAccordionSummary(props) {
   var classes = useStyles();
   var pluginStorages;
-
-  var _React$useState = React.useState({
-    createNew: false
-  }),
-      _React$useState2 = _slicedToArray(_React$useState, 2),
-      state = _React$useState2[0],
-      setState = _React$useState2[1];
   /*
-  const createNewSketch = () => {
-    setState({ ...state, createNew: true });
-  }
+  const [state, setState] = React.useState({
+    createNew: false
+  });
   */
-
 
   var RenderSketches = function RenderSketches() {
     var _useQuery = useQuery(PLUGIN_STORAGES_QUERY, {
@@ -228,35 +288,11 @@ function ActionsInAccordionSummary(props) {
           overflow: 'auto'
         }
       }, data.pluginStorages.map(function (storage) {
-        var json = JSON.parse(storage.json);
-        return /*#__PURE__*/React.createElement(Accordion, {
-          key: storage.id
-        }, /*#__PURE__*/React.createElement(AccordionSummary, {
-          expandIcon: /*#__PURE__*/React.createElement(ExpandMoreIcon, null),
-          "aria-label": "Expand",
-          "aria-controls": "additional-actions1-content",
-          id: "additional-actions1-header"
-        }, /*#__PURE__*/React.createElement(TextField, {
-          onClick: function onClick(event) {
-            return event.stopPropagation();
-          },
-          onFocus: function onFocus(event) {
-            return event.stopPropagation();
-          },
-          id: "standard-full-width",
-          style: {
-            margin: 8
-          },
-          value: json.name,
-          placeholder: "Placeholder",
-          fullWidth: true,
-          margin: "normal",
-          InputLabelProps: {
-            shrink: true
-          }
-        })), /*#__PURE__*/React.createElement(AccordionDetails, null, /*#__PURE__*/React.createElement(Typography, {
-          color: "textSecondary"
-        }, "The click event of the nested action will propagate up and expand the accordion unless you explicitly stop it.")));
+        return /*#__PURE__*/React.createElement(Sketch, {
+          client: props.client,
+          key: storage.id,
+          data: storage
+        });
       }));
     }
 
@@ -268,6 +304,18 @@ function ActionsInAccordionSummary(props) {
         _useMutation2 = _slicedToArray(_useMutation, 2),
         createStorage = _useMutation2[0],
         data = _useMutation2[1].data;
+
+    if (data) {
+      props.client.writeQuery({
+        query: PLUGIN_STORAGES_QUERY,
+        variables: {
+          pluginId: props.pluginId
+        },
+        data: {
+          pluginStorages: [].concat(_toConsumableArray(pluginStorages), [data.createPluginStorage])
+        }
+      });
+    }
 
     return /*#__PURE__*/React.createElement(Button, {
       variant: "contained",
@@ -284,13 +332,7 @@ function ActionsInAccordionSummary(props) {
               pluginId: props.pluginId,
               json: JSON.stringify(jsonPayload)
             }
-          },
-          refetchQueries: [{
-            query: PLUGIN_STORAGES_QUERY,
-            variables: {
-              pluginId: props.pluginId
-            }
-          }]
+          }
         });
       }
     }, "Create storage");
