@@ -30,12 +30,12 @@
     {
       "id": "a6539368-23de-4a0f-99c7-6e4dda32dd1b",
       "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"name\":\"Untitled sketch updated\",\"description\":\"\",\"geoJson\":\"\"}"
+      "json": "{\"name\":\"sketch 1\",\"description\":\"\",\"geoJson\":\"\"}"
     },
     {
       "id": "4cdedfe4-0beb-4bb1-80b9-7ed9ebbc585f",
       "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"name\":\"Untitled sketch\",\"description\":\"\",\"geoJson\":\"\"}"
+      "json": "{\"name\":\"sketch 2\",\"description\":\"\",\"geoJson\":\"\"}"
     }
   ]
 }
