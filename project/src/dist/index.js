@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { ApolloProvider, useMutation, useQuery } from '@apollo/client';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
@@ -6,8 +6,8 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import Button from '@material-ui/core/Button';
-import PubSub from 'pubsub-js';
-import { UPDATE_PLUGIN_SETTING_MUTATION as UPDATE_PLUGIN_SETTING_MUTATION$1, UPDATE_PLUGIN_STORAGE_MUTATION, PLUGIN_STORAGES_QUERY, DELETE_PLUGIN_STORAGE_MUTATION, CREATE_PLUGIN_STORAGE_MUTATION } from 'plugin-storage';
+import 'pubsub-js';
+import { UPDATE_PLUGIN_SETTING_MUTATION, PLUGIN_STORAGES_QUERY, UPDATE_PLUGIN_STORAGE_MUTATION, DELETE_PLUGIN_STORAGE_MUTATION, CREATE_PLUGIN_STORAGE_MUTATION } from 'plugin-storage';
 import { makeStyles } from '@material-ui/core/styles';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
@@ -17,27 +17,9 @@ import Paper from '@material-ui/core/Paper';
 import '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { v4 } from 'uuid';
-import { withLeaflet } from 'react-leaflet';
-import MeasureControlDefault from 'react-leaflet-measure';
 import gql from 'graphql-tag';
-
-function _extends() {
-  _extends = Object.assign || function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-
-    return target;
-  };
-
-  return _extends.apply(this, arguments);
-}
+import { FeatureGroup } from 'react-leaflet';
+import { EditControl } from 'react-leaflet-draw';
 
 function _taggedTemplateLiteral(strings, raw) {
   if (!raw) {
@@ -134,7 +116,7 @@ var AdminSetting = function AdminSetting(props) {
   };
 
   var Form = function Form() {
-    var _useMutation = useMutation(UPDATE_PLUGIN_SETTING_MUTATION$1),
+    var _useMutation = useMutation(UPDATE_PLUGIN_SETTING_MUTATION),
         _useMutation2 = _slicedToArray(_useMutation, 1),
         saveSetting = _useMutation2[0];
 
@@ -198,7 +180,26 @@ var AdminSetting = function AdminSetting(props) {
   }, /*#__PURE__*/React.createElement(Form, null));
 };
 
+function _templateObject() {
+  var data = _taggedTemplateLiteral(["\n  query IsSketchOpened {\n    isSketchOpened @client\n    sketchId @client\n  }\n"]);
+
+  _templateObject = function _templateObject() {
+    return data;
+  };
+
+  return data;
+}
+var OPEN_SKETCH = gql(_templateObject());
+
 var Sketch = /*#__PURE__*/memo(function (props) {
+  var _props$client$readQue = props.client.readQuery({
+    query: PLUGIN_STORAGES_QUERY,
+    variables: {
+      pluginId: props.data.pluginId
+    }
+  }),
+      pluginStorages = _props$client$readQue.pluginStorages;
+
   var _useMutation = useMutation(UPDATE_PLUGIN_STORAGE_MUTATION),
       _useMutation2 = _slicedToArray(_useMutation, 2),
       updateStorage = _useMutation2[0],
@@ -222,14 +223,6 @@ var Sketch = /*#__PURE__*/memo(function (props) {
   };
 
   var DeleteSketch = function DeleteSketch() {
-    var _props$client$readQue = props.client.readQuery({
-      query: PLUGIN_STORAGES_QUERY,
-      variables: {
-        pluginId: props.data.pluginId
-      }
-    }),
-        pluginStorages = _props$client$readQue.pluginStorages;
-
     var _useMutation3 = useMutation(DELETE_PLUGIN_STORAGE_MUTATION),
         _useMutation4 = _slicedToArray(_useMutation3, 2),
         deleteSketch = _useMutation4[0],
@@ -261,7 +254,23 @@ var Sketch = /*#__PURE__*/memo(function (props) {
     }, "Delete Sketch");
   };
 
-  return /*#__PURE__*/React.createElement(Accordion, null, /*#__PURE__*/React.createElement(AccordionSummary, {
+  var handleChanges = function handleChanges(panel) {
+    return function (evt, expanded) {
+      props.onChange(panel, expanded);
+      props.client.cache.writeQuery({
+        query: OPEN_SKETCH,
+        data: {
+          isSketchOpened: expanded,
+          sketchId: props.data.id
+        }
+      });
+    };
+  };
+
+  return /*#__PURE__*/React.createElement(Accordion, {
+    expanded: props.expanded === props.data.id,
+    onChange: handleChanges(props.data.id)
+  }, /*#__PURE__*/React.createElement(AccordionSummary, {
     expandIcon: /*#__PURE__*/React.createElement(ExpandMoreIcon, null),
     "aria-label": "Expand",
     "aria-controls": "additional-actions1-content",
@@ -304,12 +313,17 @@ var useStyles = makeStyles({
 });
 function ActionsInAccordionSummary(props) {
   var classes = useStyles();
+
+  var _React$useState = React.useState(false),
+      _React$useState2 = _slicedToArray(_React$useState, 2),
+      expanded = _React$useState2[0],
+      setExpanded = _React$useState2[1];
+
+  var handleChange = function handleChange(panel, isExpanded) {
+    setExpanded(isExpanded ? panel : false);
+  };
+
   var pluginStorages;
-  /*
-  const [state, setState] = React.useState({
-    createNew: false
-  });
-  */
 
   var RenderSketches = function RenderSketches() {
     var _useQuery = useQuery(PLUGIN_STORAGES_QUERY, {
@@ -327,6 +341,8 @@ function ActionsInAccordionSummary(props) {
         }
       }, data.pluginStorages.map(function (storage) {
         return /*#__PURE__*/React.createElement(Sketch, {
+          expanded: expanded,
+          onChange: handleChange,
           client: props.client,
           key: storage.id,
           data: storage
@@ -385,71 +401,28 @@ function ActionsInAccordionSummary(props) {
   }, /*#__PURE__*/React.createElement(NewSketch, null)), /*#__PURE__*/React.createElement(RenderSketches, null)));
 }
 
-function _templateObject2() {
-  var data = _taggedTemplateLiteral(["\n  mutation($id: ID!, $setting: String){\n    updatePluginSetting(id: $id, setting: $setting){\n      id\n      pluginId\n      setting\n    }\n  }\n"]);
+var SketchTool = /*#__PURE__*/memo(function (props) {
+  var _useState = useState(false),
+      _useState2 = _slicedToArray(_useState, 2),
+      renderDraw = _useState2[0],
+      setRenderDraw = _useState2[1];
 
-  _templateObject2 = function _templateObject2() {
-    return data;
-  };
-
-  return data;
-}
-
-function _templateObject() {
-  var data = _taggedTemplateLiteral(["\n  query PluginSettingQuery($id: ID!) {\n    pluginSetting(id: $id) {\n      id\n      pluginId\n      setting\n    }\n  }\n"]);
-
-  _templateObject = function _templateObject() {
-    return data;
-  };
-
-  return data;
-}
-var PLUGIN_SETTING_QUERY = gql(_templateObject());
-var UPDATE_PLUGIN_SETTING_MUTATION = gql(_templateObject2());
-
-var MeasureControl = withLeaflet(MeasureControlDefault);
-
-var MeasureTool = function MeasureTool(props) {
-  var storeControl = function storeControl(control) {
-    PubSub.subscribe("start-measure", function (msg, data) {
-      control.leafletElement._startMeasure();
-    });
-  };
-
-  var LoadSetting = function LoadSetting() {
-    var _useQuery = useQuery(PLUGIN_SETTING_QUERY, {
-      variables: {
-        id: props.settingId
-      }
-    }),
-        loading = _useQuery.loading,
-        error = _useQuery.error,
+  var RenderEditControl = function RenderEditControl() {
+    var _useQuery = useQuery(OPEN_SKETCH),
         data = _useQuery.data;
+    /*
+    const {data} = useQuery(PLUGIN_STORAGES_QUERY, {
+      variables: { pluginId: props.pluginId}
+    })
+    */
 
-    if (loading) return /*#__PURE__*/React.createElement("div", {
-      style: {
-        height: 200
-      }
-    }, "Loadding...");
-    if (error) console.log('this is error', error);
 
-    if (data) {
-      var setting = data.pluginSetting.setting;
-      var metrix = JSON.parse(setting).metrix;
-      var measureOptions = {
-        position: 'topright',
-        primaryLengthUnit: metrix === "imperial" ? 'feet' : 'meters',
-        secondaryLengthUnit: metrix === "imperial" ? 'miles' : 'kilometers',
-        primaryAreaUnit: metrix === "imperial" ? 'sqfeet' : 'sqmeters',
-        secondaryAreaUnit: metrix === "imperial" ? 'acres' : 'hectars',
-        activeColor: '#db4a29',
-        completedColor: '#9b2d14'
-      };
-      return /*#__PURE__*/React.createElement(MeasureControl, _extends({}, measureOptions, {
-        ref: function ref(control) {
-          return storeControl(control);
-        }
-      }));
+    if (data && data.isSketchOpened) {
+      console.log('sketh storage', data);
+      return /*#__PURE__*/React.createElement(EditControl, {
+        position: "topright",
+        draw: {}
+      });
     }
 
     return null;
@@ -457,7 +430,7 @@ var MeasureTool = function MeasureTool(props) {
 
   return /*#__PURE__*/React.createElement(ApolloProvider, {
     client: props.client
-  }, /*#__PURE__*/React.createElement(LoadSetting, null));
-};
+  }, /*#__PURE__*/React.createElement(FeatureGroup, null, /*#__PURE__*/React.createElement(RenderEditControl, null)));
+});
 
-export { AdminSetting, ActionsInAccordionSummary as Client, MeasureTool };
+export { AdminSetting, ActionsInAccordionSummary as Client, SketchTool };
