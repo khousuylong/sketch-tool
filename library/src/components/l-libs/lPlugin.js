@@ -1,41 +1,31 @@
-import React, {useState, memo} from 'react'
-import { FeatureGroup  } from 'react-leaflet'
-import { EditControl } from "react-leaflet-draw"
-import { ApolloProvider, useQuery } from '@apollo/client'
-import {OPEN_SKETCH} from '../queries/pluginQuery'
+import React, {memo} from 'react'
+import { ApolloProvider, useQuery, useMutation } from '@apollo/client'
 import {
-  PLUGIN_STORAGES_QUERY 
+  PLUGIN_STORAGES_QUERY, 
+  UPDATE_PLUGIN_STORAGE_MUTATION
 } from 'plugin-storage'
+import FGroup from './featureGroup'
 
 const SketchTool = memo((props) => {
-  const [renderDraw, setRenderDraw] = useState(false);
-
-  const RenderEditControl = () => {
-    const { data } = useQuery(OPEN_SKETCH);
-    /*
+  const RenderFGroup = () => {
+    const [updateStorage] = useMutation(UPDATE_PLUGIN_STORAGE_MUTATION);
     const {data} = useQuery(PLUGIN_STORAGES_QUERY, {
       variables: { pluginId: props.pluginId}
     })
-    */
-
-    if(data && data.isSketchOpened){
-      console.log('sketh storage', data)
-      return(
-        <EditControl
-          position='topright'
-          draw={{
-          }}
-        />
-      )
+    const handleUpdate = payload => {
+      updateStorage({variables: payload})
     }
-    return null;
+    if(data){
+      console.log('this is data', data)
+      return(
+        <FGroup onUpdated={handleUpdate} client={props.client} pluginId={props.pluginId} storages={data.pluginStorages}/>
+      ) 
+    }
+    return null
   }
-
   return(
-    <ApolloProvider client={props.client}>
-      <FeatureGroup>
-        <RenderEditControl />
-      </FeatureGroup>
+    <ApolloProvider client={props.client} >
+      <RenderFGroup />
     </ApolloProvider>
   )
 })

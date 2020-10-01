@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react';
+import React, { memo } from 'react';
 import { ApolloProvider, useMutation, useQuery } from '@apollo/client';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
@@ -20,6 +20,7 @@ import { v4 } from 'uuid';
 import gql from 'graphql-tag';
 import { FeatureGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
+import L from 'leaflet';
 
 function _taggedTemplateLiteral(strings, raw) {
   if (!raw) {
@@ -401,27 +402,146 @@ function ActionsInAccordionSummary(props) {
   }, /*#__PURE__*/React.createElement(NewSketch, null)), /*#__PURE__*/React.createElement(RenderSketches, null)));
 }
 
-var SketchTool = /*#__PURE__*/memo(function (props) {
-  var _useState = useState(false),
-      _useState2 = _slicedToArray(_useState, 2),
-      renderDraw = _useState2[0],
-      setRenderDraw = _useState2[1];
+var FGroup = /*#__PURE__*/memo(function (props) {
+  var fgRendered = false;
+  var activeStorage;
+  var fGref;
+
+  var onCreated = function onCreated(e) {
+    var geoJsons = [];
+    console.log('after created', fGref.getLayers());
+    fGref.getLayers().map(function (layer) {
+      var geoJSON = layer.toGeoJSON();
+
+      if (layer instanceof L.Circle) {
+        geoJSON['properties']['radius'] = layer.getRadius();
+        geoJSON['properties']['type'] = "circle";
+      }
+
+      geoJsons.push({
+        options: layer['options'],
+        geojson: geoJSON
+      });
+    });
+    var json = JSON.parse(activeStorage.json);
+    json['geoJson'] = geoJsons;
+    var payload = {
+      id: activeStorage.id,
+      json: JSON.stringify(json)
+    };
+    props.onUpdated(payload);
+  };
+
+  var _rendreGeoJsonLayer = function _rendreGeoJsonLayer(storage) {
+    console.log('ensure one time rendering');
+    var json = JSON.parse(storage.json);
+    if (!json.geoJson) return;
+    console.log('---------------');
+    json.geoJson.map(function (geojson) {
+      console.log('json', geojson);
+      var geojsonLayer = L.geoJson(geojson['geojson'], {
+        style: geojson['options']
+        /*
+        pointToLayer: function(feature, latlng) {
+          if (feature.properties.radius) {
+            return new L.Circle(latlng, feature.properties.radius);
+          }
+          if( geojson['options']['type'] === "annotation"){
+            var icon = L.icon({
+              iconUrl: '',
+              shadowUrl: '',
+              iconSize:     [0, 0],
+              shadowSize:   [0, 0], 
+              iconAnchor:   [0, 0], 
+              shadowAnchor: [0, 0], 
+              popupAnchor:  [1, 1]
+            });
+            return L.marker(latlng, { icon: icon, type: 'annotation', annotation: geojson['options']['annotation']});
+          }
+          return L.marker(latlng, {icon: L.icon({
+            iconUrl: geojson['options']['icon']['options']['iconUrl'],
+            iconSize:     [25, 41], 
+            iconAnchor:   [12, 41]
+          })});
+        }
+        */
+
+      });
+      geojsonLayer.eachLayer(function (layer) {
+        if (fGref) fGref.addLayer(layer);
+      });
+    });
+  };
 
   var RenderEditControl = function RenderEditControl() {
     var _useQuery = useQuery(OPEN_SKETCH),
         data = _useQuery.data;
-    /*
-    const {data} = useQuery(PLUGIN_STORAGES_QUERY, {
-      variables: { pluginId: props.pluginId}
-    })
-    */
-
 
     if (data && data.isSketchOpened) {
-      console.log('sketh storage', data);
-      return /*#__PURE__*/React.createElement(EditControl, {
-        position: "topright",
-        draw: {}
+      activeStorage = props.storages.find(function (storage) {
+        return storage.id === data.sketchId;
+      }); //Need to check this, because useQuery somehow cause the {data} to return twice
+      //So with !fgRendered to ensure only one time the edit control is render
+
+      if (!fgRendered) {
+        _rendreGeoJsonLayer(activeStorage);
+
+        fgRendered = true;
+        return /*#__PURE__*/React.createElement(EditControl, {
+          onCreated: onCreated,
+          position: "topright",
+          draw: {}
+        });
+      }
+    }
+
+    return null;
+  };
+
+  var _onFeatureGroupReady = function _onFeatureGroupReady(reactFGref) {
+    /*
+    let leafletGeoJSON = new L.GeoJSON(getGeoJson());
+    let leafletFG = reactFGref.leafletElement;
+     leafletGeoJSON.eachLayer( (layer) => {
+      leafletFG.addLayer(layer);
+    });
+    */
+    fGref = reactFGref.leafletElement;
+  };
+
+  return /*#__PURE__*/React.createElement(FeatureGroup, {
+    ref: function ref(reactFGref) {
+      if (reactFGref) _onFeatureGroupReady(reactFGref);
+    }
+  }, /*#__PURE__*/React.createElement(RenderEditControl, null));
+});
+
+var SketchTool = /*#__PURE__*/memo(function (props) {
+  var RenderFGroup = function RenderFGroup() {
+    var _useMutation = useMutation(UPDATE_PLUGIN_STORAGE_MUTATION),
+        _useMutation2 = _slicedToArray(_useMutation, 1),
+        updateStorage = _useMutation2[0];
+
+    var _useQuery = useQuery(PLUGIN_STORAGES_QUERY, {
+      variables: {
+        pluginId: props.pluginId
+      }
+    }),
+        data = _useQuery.data;
+
+    var handleUpdate = function handleUpdate(payload) {
+      updateStorage({
+        variables: payload
+      });
+    };
+
+    if (data) {
+      console.log('this is data', data);
+      return /*#__PURE__*/React.createElement(FGroup, {
+        onUpdated: handleUpdate,
+        client: props.client,
+        pluginId: props.pluginId,
+        storages: data.pluginStorages
       });
     }
 
@@ -430,7 +550,7 @@ var SketchTool = /*#__PURE__*/memo(function (props) {
 
   return /*#__PURE__*/React.createElement(ApolloProvider, {
     client: props.client
-  }, /*#__PURE__*/React.createElement(FeatureGroup, null, /*#__PURE__*/React.createElement(RenderEditControl, null)));
+  }, /*#__PURE__*/React.createElement(RenderFGroup, null));
 });
 
 export { AdminSetting, ActionsInAccordionSummary as Client, SketchTool };

@@ -28,14 +28,9 @@
   ],
   "pluginStorages": [
     {
-      "id": "4cdedfe4-0beb-4bb1-80b9-7ed9ebbc585f",
+      "id": "f9293cbf-d8ab-46fb-a0a4-3864e74c0012",
       "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"name\":\"sketch 2\",\"description\":\"\",\"geoJson\":\"\"}"
-    },
-    {
-      "id": "c613726a-a725-41a1-9629-f1bee28b6e44",
-      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"name\":\"updated name\",\"description\":\"\",\"geoJson\":\"\"}"
+      "json": "{\"name\":\"Untitled sketch\",\"description\":\"\",\"geoJson\":[{\"options\":{\"stroke\":true,\"color\":\"#3388ff\",\"weight\":4,\"opacity\":0.5,\"fill\":true,\"fillColor\":null,\"fillOpacity\":0.2,\"clickable\":true},\"geojson\":{\"type\":\"Feature\",\"properties\":{},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[-0.124626,51.508101],[-0.124626,51.527329],[-0.062141,51.527329],[-0.062141,51.508101],[-0.124626,51.508101]]]}}}]}"
     }
   ]
 }
