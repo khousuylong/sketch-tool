@@ -30,7 +30,12 @@
     {
       "id": "f9293cbf-d8ab-46fb-a0a4-3864e74c0012",
       "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
-      "json": "{\"name\":\"Untitled sketch\",\"description\":\"\",\"geoJson\":[{\"options\":{\"stroke\":true,\"color\":\"#3388ff\",\"weight\":4,\"opacity\":0.5,\"fill\":true,\"fillColor\":null,\"fillOpacity\":0.2,\"clickable\":true},\"geojson\":{\"type\":\"Feature\",\"properties\":{},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[-0.124626,51.508101],[-0.124626,51.527329],[-0.062141,51.527329],[-0.062141,51.508101],[-0.124626,51.508101]]]}}}]}"
+      "json": "{\"name\":\"Sketch 1\",\"description\":\"\",\"geoJson\":[{\"options\":{\"stroke\":true,\"color\":\"#3388ff\",\"weight\":4,\"opacity\":0.5,\"fill\":true,\"fillColor\":null,\"fillOpacity\":0.2,\"clickable\":true},\"geojson\":{\"type\":\"Feature\",\"properties\":{},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[-0.124626,51.508101],[-0.124626,51.527329],[-0.062141,51.527329],[-0.062141,51.508101],[-0.124626,51.508101]]]}}}]}"
+    },
+    {
+      "id": "26b8ab8b-661e-445f-81ea-48c2d959258d",
+      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
+      "json": "{\"name\":\"sketch 2\",\"description\":\"\",\"geoJson\":[{\"options\":{\"stroke\":true,\"color\":\"#3388ff\",\"weight\":4,\"opacity\":0.5,\"fill\":true,\"fillColor\":null,\"fillOpacity\":0.2,\"clickable\":true},\"geojson\":{\"type\":\"Feature\",\"properties\":{},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[-0.085831,51.504789],[-0.085831,51.517503],[-0.047722,51.517503],[-0.047722,51.504789],[-0.085831,51.504789]]]}}}]}"
     }
   ]
 }

@@ -402,43 +402,13 @@ function ActionsInAccordionSummary(props) {
   }, /*#__PURE__*/React.createElement(NewSketch, null)), /*#__PURE__*/React.createElement(RenderSketches, null)));
 }
 
-var FGroup = /*#__PURE__*/memo(function (props) {
-  var fgRendered = false;
-  var activeStorage;
-  var fGref;
-
-  var onCreated = function onCreated(e) {
-    var geoJsons = [];
-    console.log('after created', fGref.getLayers());
-    fGref.getLayers().map(function (layer) {
-      var geoJSON = layer.toGeoJSON();
-
-      if (layer instanceof L.Circle) {
-        geoJSON['properties']['radius'] = layer.getRadius();
-        geoJSON['properties']['type'] = "circle";
-      }
-
-      geoJsons.push({
-        options: layer['options'],
-        geojson: geoJSON
-      });
-    });
-    var json = JSON.parse(activeStorage.json);
-    json['geoJson'] = geoJsons;
-    var payload = {
-      id: activeStorage.id,
-      json: JSON.stringify(json)
-    };
-    props.onUpdated(payload);
-  };
+var GeoJsonLayer = /*#__PURE__*/memo(function (props) {
+  var fgRef = props.fgRef;
 
   var _rendreGeoJsonLayer = function _rendreGeoJsonLayer(storage) {
-    console.log('ensure one time rendering');
     var json = JSON.parse(storage.json);
     if (!json.geoJson) return;
-    console.log('---------------');
     json.geoJson.map(function (geojson) {
-      console.log('json', geojson);
       var geojsonLayer = L.geoJson(geojson['geojson'], {
         style: geojson['options']
         /*
@@ -468,44 +438,50 @@ var FGroup = /*#__PURE__*/memo(function (props) {
 
       });
       geojsonLayer.eachLayer(function (layer) {
-        if (fGref) fGref.addLayer(layer);
+        if (fgRef) fgRef.addLayer(layer);
       });
     });
   };
+
+  var onCreated = function onCreated() {};
+
+  fgRef.clearLayers();
+
+  if (props.expanded) {
+    _rendreGeoJsonLayer(props.data);
+
+    return /*#__PURE__*/React.createElement(EditControl, {
+      onCreated: onCreated,
+      position: "topright",
+      draw: {}
+    });
+  }
+});
+
+var FGroup = /*#__PURE__*/memo(function (props) {
+  var fGref;
 
   var RenderEditControl = function RenderEditControl() {
     var _useQuery = useQuery(OPEN_SKETCH),
         data = _useQuery.data;
 
-    if (data && data.isSketchOpened) {
-      activeStorage = props.storages.find(function (storage) {
+    if (data) {
+      // && data.isSketchOpened){
+      var _activeStorage = props.storages.find(function (storage) {
         return storage.id === data.sketchId;
-      }); //Need to check this, because useQuery somehow cause the {data} to return twice
-      //So with !fgRendered to ensure only one time the edit control is render
+      });
 
-      if (!fgRendered) {
-        _rendreGeoJsonLayer(activeStorage);
-
-        fgRendered = true;
-        return /*#__PURE__*/React.createElement(EditControl, {
-          onCreated: onCreated,
-          position: "topright",
-          draw: {}
-        });
-      }
+      return /*#__PURE__*/React.createElement(GeoJsonLayer, {
+        expanded: data.isSketchOpened,
+        data: _activeStorage,
+        fgRef: fGref
+      });
     }
 
     return null;
   };
 
   var _onFeatureGroupReady = function _onFeatureGroupReady(reactFGref) {
-    /*
-    let leafletGeoJSON = new L.GeoJSON(getGeoJson());
-    let leafletFG = reactFGref.leafletElement;
-     leafletGeoJSON.eachLayer( (layer) => {
-      leafletFG.addLayer(layer);
-    });
-    */
     fGref = reactFGref.leafletElement;
   };
 
