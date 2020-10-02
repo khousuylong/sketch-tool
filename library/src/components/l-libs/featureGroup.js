@@ -10,58 +10,22 @@ import {
   UPDATE_PLUGIN_STORAGE_MUTATION
 } from 'plugin-storage'
 
-const FGroup = memo((props) => {
-
-  let fgRendered = false
-  let activeStorage
-  let fGref;
-  const onCreated = e => {
-    const geoJsons = []
-    console.log('after created', fGref.getLayers())
-    fGref.getLayers().map(layer => {
-      const geoJSON = layer.toGeoJSON()
-
-			if( layer instanceof L.Circle  ){
-				geoJSON['properties']['radius']	= layer.getRadius();
-				geoJSON['properties']['type'] = "circle";
-			}
-			geoJsons.push({
-				options: layer['options'],		
-				geojson: geoJSON 
-			})
-    })
-
-    const json =  JSON.parse(activeStorage.json)
-    json['geoJson'] = geoJsons;
-  
-    const payload = {
-      id: activeStorage.id, json: JSON.stringify(json)
+class FGroup extends React.Component {
+  render() {
+    const RenderEditControl = () => {
+      const { data } = useQuery(OPEN_SKETCH);
+      if(data){// && data.isSketchOpened){
+        const activeStorage = this.props.storages.find(storage => storage.id === data.sketchId)
+        return(<GeoJsonLayer onUpdated={this.props.onUpdated} expanded={data.isSketchOpened} data={activeStorage} fgRef={this._fGref}/>)
+      }
+      return null;
     }
-
-    props.onUpdated(payload)
-    
+    return(
+      <FeatureGroup ref={ reactFGref => { if(reactFGref) this._fGref = reactFGref.leafletElement }} >
+        <RenderEditControl />
+      </FeatureGroup>
+    )
   }
+}
 
-  const RenderEditControl = () => {
-    const { data } = useQuery(OPEN_SKETCH);
-    if(data){// && data.isSketchOpened){
-      const activeStorage = props.storages.find(storage => storage.id === data.sketchId)
-      return(<GeoJsonLayer onUpdated={props.onUpdated} expanded={data.isSketchOpened} data={activeStorage} fgRef={fGref}/>)
-    }
-    return null;
-  }
-
-
-  const _onFeatureGroupReady = reactFGref => {
-    fGref = reactFGref.leafletElement
-  } 
-
-  return(
-    <FeatureGroup ref={ reactFGref => {
-        if(reactFGref) _onFeatureGroupReady(reactFGref)
-      }}>
-      <RenderEditControl />
-    </FeatureGroup>
-  )
-})
 export default FGroup
