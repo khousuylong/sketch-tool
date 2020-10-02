@@ -403,7 +403,8 @@ function ActionsInAccordionSummary(props) {
 }
 
 var GeoJsonLayer = /*#__PURE__*/memo(function (props) {
-  var fgRef = props.fgRef;
+  var fgRef = props.fgRef,
+      data = props.data;
 
   var _rendreGeoJsonLayer = function _rendreGeoJsonLayer(storage) {
     var json = JSON.parse(storage.json);
@@ -443,18 +444,42 @@ var GeoJsonLayer = /*#__PURE__*/memo(function (props) {
     });
   };
 
-  var onCreated = function onCreated() {};
+  var onCreated = function onCreated(e) {
+    var geoJsons = [];
+    fgRef.getLayers().map(function (layer) {
+      var geoJSON = layer.toGeoJSON();
 
-  fgRef.clearLayers();
+      if (layer instanceof L.Circle) {
+        geoJSON['properties']['radius'] = layer.getRadius();
+        geoJSON['properties']['type'] = "circle";
+      }
 
-  if (props.expanded) {
-    _rendreGeoJsonLayer(props.data);
-
-    return /*#__PURE__*/React.createElement(EditControl, {
-      onCreated: onCreated,
-      position: "topright",
-      draw: {}
+      geoJsons.push({
+        options: layer['options'],
+        geojson: geoJSON
+      });
     });
+    var json = JSON.parse(data.json);
+    json['geoJson'] = geoJsons;
+    var payload = {
+      id: data.id,
+      json: JSON.stringify(json)
+    };
+    props.onUpdated(payload);
+  };
+
+  if (fgRef) {
+    fgRef.clearLayers();
+
+    if (props.expanded) {
+      _rendreGeoJsonLayer(props.data);
+
+      return /*#__PURE__*/React.createElement(EditControl, {
+        onCreated: onCreated,
+        position: "topright",
+        draw: {}
+      });
+    }
   }
 });
 
@@ -472,6 +497,7 @@ var FGroup = /*#__PURE__*/memo(function (props) {
       });
 
       return /*#__PURE__*/React.createElement(GeoJsonLayer, {
+        onUpdated: props.onUpdated,
         expanded: data.isSketchOpened,
         data: _activeStorage,
         fgRef: fGref

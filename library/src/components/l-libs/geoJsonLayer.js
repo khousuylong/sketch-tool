@@ -10,7 +10,7 @@ import {
 } from 'plugin-storage'
 
 const GeoJsonLayer = memo((props) => {
-  const {fgRef} = props;
+  const {fgRef, data} = props;
   const _rendreGeoJsonLayer = storage => {
     const json = JSON.parse(storage.json);
 
@@ -51,20 +51,45 @@ const GeoJsonLayer = memo((props) => {
     })
   }
 
-  const onCreated = () => {}
+  const onCreated = e => {
+    const geoJsons = []
+    fgRef.getLayers().map(layer => {
+      const geoJSON = layer.toGeoJSON()
 
-  fgRef.clearLayers()
+			if( layer instanceof L.Circle  ){
+				geoJSON['properties']['radius']	= layer.getRadius();
+				geoJSON['properties']['type'] = "circle";
+			}
+			geoJsons.push({
+				options: layer['options'],		
+				geojson: geoJSON 
+			})
+    })
 
-  if(props.expanded){
-    _rendreGeoJsonLayer(props.data)
-    return(
-      <EditControl  
-        onCreated={onCreated}
-        position='topright'
-        draw={{
-        }}
-      />
-    )
+    const json =  JSON.parse(data.json)
+    json['geoJson'] = geoJsons;
+  
+    const payload = {
+      id: data.id, json: JSON.stringify(json)
+    }
+    props.onUpdated(payload)
   }
+
+  if(fgRef){
+    fgRef.clearLayers()
+    if(props.expanded){
+      _rendreGeoJsonLayer(props.data)
+      return(
+        <EditControl  
+          onCreated={onCreated}
+          position='topright'
+          draw={{
+          }}
+        />
+      )
+    }
+  } 
+
+  
 })
 export default GeoJsonLayer

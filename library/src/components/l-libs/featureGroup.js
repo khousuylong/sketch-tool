@@ -46,7 +46,7 @@ const FGroup = memo((props) => {
     const { data } = useQuery(OPEN_SKETCH);
     if(data){// && data.isSketchOpened){
       const activeStorage = props.storages.find(storage => storage.id === data.sketchId)
-      return(<GeoJsonLayer expanded={data.isSketchOpened} data={activeStorage} fgRef={fGref}/>)
+      return(<GeoJsonLayer onUpdated={props.onUpdated} expanded={data.isSketchOpened} data={activeStorage} fgRef={fGref}/>)
     }
     return null;
   }
