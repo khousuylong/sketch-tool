@@ -1,6 +1,6 @@
 import React, {useState, memo} from 'react'
 import { FeatureGroup  } from 'react-leaflet'
-import { EditControl } from './editControl'//"react-leaflet-draw"
+import EditControl from './editControl'//"react-leaflet-draw"
 import { useQuery, useMutation } from '@apollo/client'
 import L from 'leaflet'
 import {OPEN_SKETCH} from '../queries/pluginQuery'
