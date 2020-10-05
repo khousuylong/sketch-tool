@@ -512,12 +512,14 @@ var GeoJsonLayer = /*#__PURE__*/memo(function (props) {
     if (!json.geoJson) return;
     json.geoJson.map(function (geojson) {
       var geojsonLayer = L.geoJson(geojson['geojson'], {
-        style: geojson['options']
-        /*
-        pointToLayer: function(feature, latlng) {
+        style: geojson['options'],
+        pointToLayer: function pointToLayer(feature, latlng) {
+          console.log(feature);
+
           if (feature.properties.radius) {
             return new L.Circle(latlng, feature.properties.radius);
           }
+          /*
           if( geojson['options']['type'] === "annotation"){
             var icon = L.icon({
               iconUrl: '',
@@ -530,14 +532,19 @@ var GeoJsonLayer = /*#__PURE__*/memo(function (props) {
             });
             return L.marker(latlng, { icon: icon, type: 'annotation', annotation: geojson['options']['annotation']});
           }
-          return L.marker(latlng, {icon: L.icon({
+          */
+
+
+          console.log(geojson['options']);
+          return L.marker(latlng);
+          /*
+            , {icon: L.icon({
             iconUrl: geojson['options']['icon']['options']['iconUrl'],
             iconSize:     [25, 41], 
             iconAnchor:   [12, 41]
           })});
+          */
         }
-        */
-
       });
       geojsonLayer.eachLayer(function (layer) {
         if (fgRef) fgRef.addLayer(layer);
@@ -545,7 +552,7 @@ var GeoJsonLayer = /*#__PURE__*/memo(function (props) {
     });
   };
 
-  var onCreated = function onCreated(e) {
+  var _onCreated = function _onCreated(e) {
     var geoJsons = [];
     fgRef.getLayers().map(function (layer) {
       var geoJSON = layer.toGeoJSON();
@@ -569,6 +576,10 @@ var GeoJsonLayer = /*#__PURE__*/memo(function (props) {
     props.onUpdated(payload);
   };
 
+  var _onEditStart = function _onEditStart(e) {
+    console.log('on edit start', e);
+  };
+
   if (fgRef) {
     fgRef.clearLayers();
 
@@ -576,8 +587,9 @@ var GeoJsonLayer = /*#__PURE__*/memo(function (props) {
       _rendreGeoJsonLayer(props.data);
 
       return /*#__PURE__*/React.createElement(EditControl, {
-        onCreated: onCreated,
+        onCreated: _onCreated,
         position: "topright",
+        onEditStart: _onEditStart,
         draw: {}
       });
     }

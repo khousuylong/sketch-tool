@@ -1,6 +1,6 @@
 import React, {useState, memo} from 'react'
 import { FeatureGroup  } from 'react-leaflet'
-import { EditControl } from "react-leaflet-draw"
+import { EditControl } from './editControl'//"react-leaflet-draw"
 import { useQuery, useMutation } from '@apollo/client'
 import L from 'leaflet'
 import {OPEN_SKETCH} from '../queries/pluginQuery'
@@ -19,11 +19,12 @@ const GeoJsonLayer = memo((props) => {
     json.geoJson.map(geojson=>{
       const geojsonLayer = 	L.geoJson(geojson['geojson'], {
         style: geojson['options'],
-        /*
         pointToLayer: function(feature, latlng) {
+          console.log(feature)
           if (feature.properties.radius) {
             return new L.Circle(latlng, feature.properties.radius);
           }
+          /*
           if( geojson['options']['type'] === "annotation"){
             var icon = L.icon({
               iconUrl: '',
@@ -36,13 +37,17 @@ const GeoJsonLayer = memo((props) => {
             });
             return L.marker(latlng, { icon: icon, type: 'annotation', annotation: geojson['options']['annotation']});
           }
-          return L.marker(latlng, {icon: L.icon({
+          */
+          console.log(geojson['options'])
+          return L.marker(latlng)
+          /*
+            , {icon: L.icon({
             iconUrl: geojson['options']['icon']['options']['iconUrl'],
             iconSize:     [25, 41], 
             iconAnchor:   [12, 41]
           })});
+          */
         }
-        */
       });
       geojsonLayer.eachLayer(function(layer){
         if(fgRef) fgRef.addLayer(layer);
@@ -51,7 +56,7 @@ const GeoJsonLayer = memo((props) => {
     })
   }
 
-  const onCreated = e => {
+  const _onCreated = e => {
     const geoJsons = []
     fgRef.getLayers().map(layer => {
       const geoJSON = layer.toGeoJSON()
@@ -75,14 +80,19 @@ const GeoJsonLayer = memo((props) => {
     props.onUpdated(payload)
   }
 
+  const _onEditStart = e => {
+    console.log('on edit start', e)
+  }
+
   if(fgRef){
     fgRef.clearLayers()
     if(props.expanded){
       _rendreGeoJsonLayer(props.data)
       return(
         <EditControl  
-          onCreated={onCreated}
+          onCreated={_onCreated}
           position='topright'
+          onEditStart={_onEditStart}
           draw={{
           }}
         />
