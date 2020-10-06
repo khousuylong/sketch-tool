@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, Component } from 'react';
 import { ApolloProvider, useMutation, useQuery } from '@apollo/client';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
@@ -8,13 +8,13 @@ import FormLabel from '@material-ui/core/FormLabel';
 import Button from '@material-ui/core/Button';
 import 'pubsub-js';
 import { UPDATE_PLUGIN_SETTING_MUTATION, PLUGIN_STORAGES_QUERY, UPDATE_PLUGIN_STORAGE_MUTATION, DELETE_PLUGIN_STORAGE_MUTATION, CREATE_PLUGIN_STORAGE_MUTATION } from 'plugin-storage';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
-import '@material-ui/core/Typography';
+import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { v4 } from 'uuid';
 import gql from 'graphql-tag';
@@ -23,6 +23,16 @@ import 'react-leaflet-draw';
 import L, { Map } from 'leaflet';
 import 'leaflet-draw';
 import isEqual from 'lodash-es/isEqual';
+import ReactDOM from 'react-dom';
+import Divider from '@material-ui/core/Divider';
+import Grid from '@material-ui/core/Grid';
+import ListItemText from '@material-ui/core/ListItemText';
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
+import reactCSS from 'reactcss';
+import { CompactPicker } from 'react-color';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -363,6 +373,16 @@ var AdminSetting = function AdminSetting(props) {
   }, /*#__PURE__*/React.createElement(Form, null));
 };
 
+function _templateObject2() {
+  var data = _taggedTemplateLiteral(["\n  query IsEditingGeoJson {\n    isEditingGeoJson @client\n  }\n"]);
+
+  _templateObject2 = function _templateObject2() {
+    return data;
+  };
+
+  return data;
+}
+
 function _templateObject() {
   var data = _taggedTemplateLiteral(["\n  query IsSketchOpened {\n    isSketchOpened @client\n    sketchId @client\n  }\n"]);
 
@@ -373,6 +393,7 @@ function _templateObject() {
   return data;
 }
 var OPEN_SKETCH = gql(_templateObject());
+var EDIT_GEOJSON = gql(_templateObject2());
 
 var Sketch = /*#__PURE__*/memo(function (props) {
   var _props$client$readQue = props.client.readQuery({
@@ -450,6 +471,17 @@ var Sketch = /*#__PURE__*/memo(function (props) {
     };
   };
 
+  var Editor = function Editor() {
+    var _useQuery = useQuery(EDIT_GEOJSON),
+        data = _useQuery.data;
+
+    if (data) {
+      return /*#__PURE__*/React.createElement("div", null);
+    }
+
+    return /*#__PURE__*/React.createElement(DeleteSketch, null);
+  };
+
   return /*#__PURE__*/React.createElement(Accordion, {
     expanded: props.expanded === props.data.id,
     onChange: handleChanges(props.data.id)
@@ -477,7 +509,12 @@ var Sketch = /*#__PURE__*/memo(function (props) {
     InputLabelProps: {
       shrink: true
     }
-  })), /*#__PURE__*/React.createElement(AccordionDetails, null, /*#__PURE__*/React.createElement(DeleteSketch, null)));
+  })), /*#__PURE__*/React.createElement(AccordionDetails, null, /*#__PURE__*/React.createElement(Editor, null), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: '100%'
+    },
+    id: "sketch-container-".concat(props.data.id)
+  })));
 });
 
 var useStyles = makeStyles({
@@ -2019,9 +2056,409 @@ function createDrawElement(props) {
 
 var EditControl$1 = withLeaflet(EditControl);
 
+var styles = function styles(theme) {
+  return {
+    listItem: {
+      paddingTop: '5px',
+      paddingBottom: '5px'
+    }
+  };
+};
+
+var ColorPickerPanel = /*#__PURE__*/function (_Component) {
+  _inherits(ColorPickerPanel, _Component);
+
+  var _super = _createSuper(ColorPickerPanel);
+
+  function ColorPickerPanel(props) {
+    var _this;
+
+    _classCallCheck(this, ColorPickerPanel);
+
+    _this = _super.call(this, props);
+
+    _defineProperty(_assertThisInitialized(_this), "handleClickOpen", function () {
+      _this.setState({
+        open: true
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "handleClose", function () {
+      _this.setState({
+        open: false
+      });
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "handleChange", function (color) {
+      _this.setState({
+        color: color.hex
+      });
+
+      _this.handleClose();
+
+      _this.props.onChange(color.hex);
+    });
+
+    _this.state = {
+      open: false,
+      color: _this.props.color || "#FFF"
+    };
+    return _this;
+  }
+
+  _createClass(ColorPickerPanel, [{
+    key: "render",
+    value: function render() {
+      var _this$props = this.props,
+          classes = _this$props.classes,
+          title = _this$props.title,
+          description = _this$props.description,
+          buttonText = _this$props.buttonText,
+          _this$props$testId = _this$props.testId,
+          testId = _this$props$testId === void 0 ? "" : _this$props$testId;
+      var styles = reactCSS({
+        'default': {
+          color: {
+            width: '25px',
+            height: '20px',
+            borderRadius: '2px',
+            background: this.state.color
+          },
+          swatch: {
+            padding: '5px',
+            background: '#fff',
+            borderRadius: '1px',
+            boxShadow: '0 0 0 1px rgba(0,0,0,.1)',
+            display: 'inline-block',
+            cursor: 'pointer'
+          }
+        }
+      });
+      return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+        className: classes.listItem
+      }, /*#__PURE__*/React.createElement(Grid, {
+        container: true
+      }, /*#__PURE__*/React.createElement(Grid, {
+        item: true,
+        xs: 12,
+        alignItems: "center",
+        sm: true,
+        container: true
+      }, /*#__PURE__*/React.createElement(Grid, {
+        item: true
+      }, /*#__PURE__*/React.createElement(ListItemText, {
+        primary: title
+      }), /*#__PURE__*/React.createElement(ListItemText, {
+        secondary: description,
+        className: "no-padding"
+      })), /*#__PURE__*/React.createElement(Grid, {
+        item: true,
+        xs: true,
+        container: true,
+        justify: "flex-end"
+      }, /*#__PURE__*/React.createElement("div", {
+        "data-testid": "".concat(testId, "-open-picker"),
+        style: styles.swatch,
+        onClick: this.handleClickOpen
+      }, /*#__PURE__*/React.createElement("div", {
+        style: styles.color
+      })))))), /*#__PURE__*/React.createElement(Dialog, {
+        "data-testid": "color-picker-dialog",
+        maxWidth: "lg",
+        open: this.state.open,
+        onClose: this.handleClose,
+        "aria-labelledby": "form-dialog-title",
+        "aria-describedby": "alert-dialog-description"
+      }, /*#__PURE__*/React.createElement(DialogContent, {
+        className: classes.noPadding,
+        id: "alert-dialog-description"
+      }, this.props.colors ? /*#__PURE__*/React.createElement(CompactPicker, {
+        colors: this.props.colors,
+        color: this.state.color,
+        onChange: this.handleChange
+      }) : /*#__PURE__*/React.createElement(CompactPicker, {
+        color: this.state.color,
+        onChange: this.handleChange
+      }))));
+    }
+  }]);
+
+  return ColorPickerPanel;
+}(Component);
+
+var ColorPickerPanel$1 = withStyles(styles)(ColorPickerPanel);
+
+var styles$1 = function styles(theme) {
+  return {
+    listItem: {
+      paddingTop: '5px',
+      paddingBottom: '5px'
+    }
+  };
+};
+
+var ListPanel = function ListPanel(props) {
+  var classes = props.classes,
+      label = props.label;
+  return /*#__PURE__*/React.createElement(ListItem, {
+    style: {
+      padding: 0
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: classes.listItem
+  }, /*#__PURE__*/React.createElement(ListItemText, {
+    primary: label
+  }), /*#__PURE__*/React.createElement(ListItemSecondaryAction, {
+    style: {
+      right: 0
+    }
+  }, props.children)));
+};
+
+var ListPanel$1 = withStyles(styles$1)(ListPanel);
+
+var _FeildInput$propTypes;
+
+var FeildInput = /*#__PURE__*/function (_React$Component) {
+  _inherits(FeildInput, _React$Component);
+
+  var _super = _createSuper(FeildInput);
+
+  function FeildInput(props) {
+    var _this;
+
+    _classCallCheck(this, FeildInput);
+
+    _this = _super.call(this, props);
+
+    _defineProperty(_assertThisInitialized(_this), "handleSize", function (event) {
+      _this.setState({
+        outlineSize: event.target.value
+      });
+
+      _this.props.onChange(event.target.value);
+    });
+
+    _this.state = {
+      outlineSize: _this.props.size
+    };
+    return _this;
+  }
+
+  _createClass(FeildInput, [{
+    key: "render",
+    value: function render() {
+      var _this$props = this.props,
+          type = _this$props.type,
+          label = _this$props.label;
+      return /*#__PURE__*/React.createElement(ListPanel$1, {
+        label: label
+      }, /*#__PURE__*/React.createElement(TextField, {
+        inputProps: {
+          'data-testid': 'outline-size'
+        },
+        style: {
+          width: 40
+        },
+        autoFocus: true,
+        margin: "dense",
+        id: "outlineSize",
+        label: "",
+        type: type,
+        value: this.state.outlineSize,
+        onChange: this.handleSize
+      }));
+    }
+  }]);
+
+  return FeildInput;
+}(React.Component);
+
+FeildInput.propTypes = (_FeildInput$propTypes = {
+  type: propTypes.string,
+  label: propTypes.string
+}, _defineProperty(_FeildInput$propTypes, "label", propTypes.any.isRequired), _defineProperty(_FeildInput$propTypes, "size", propTypes.number), _FeildInput$propTypes);
+
+var ShapeEditor = /*#__PURE__*/function () {
+  function ShapeEditor(container, layer, callback, client) {
+    _classCallCheck(this, ShapeEditor);
+
+    this._apolloClient = client;
+    this._container = container;
+    this._layer = layer;
+    console.log('this is layer', layer);
+    this._callback = callback;
+
+    this._initEvents();
+  }
+
+  _createClass(ShapeEditor, [{
+    key: "_initEvents",
+    value: function _initEvents() {
+      var self = this;
+
+      this._layer.on('click', function (e) {
+        if (!window._sketchEditing) {
+          self.open();
+          window._sketchEditing = true;
+        }
+        /*
+        if(MangoGis.ON_DRAW_CLICKED) return;
+        if( !map['is_editing'] ){
+        self.open();
+        map['is_editing'] = true;
+        }
+        MangoGis.Event.trigger(self, "shape-clicked");
+        L.DomEvent.stop(e);
+        */
+
+      });
+    }
+  }, {
+    key: "_initShapeEditControl",
+    value: function _initShapeEditControl() {
+      var _this = this;
+
+      this._apolloClient.cache.writeQuery({
+        query: EDIT_GEOJSON,
+        data: {
+          isEditingGeoJson: true
+        }
+      });
+
+      var App = function App() {
+        return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Typography, {
+          variant: "subtitle2",
+          gutterBottom: true
+        }, "Stroke"), /*#__PURE__*/React.createElement(ColorPickerPanel$1, {
+          testId: "",
+          onChange: function onChange(color) {
+            return _this._layer.setStyle({
+              color: color
+            });
+          },
+          title: "Color",
+          description: "",
+          color: _this._layer.options['color']
+        }), /*#__PURE__*/React.createElement(FeildInput, {
+          onChange: function onChange(weight) {
+            return _this._layer.setStyle({
+              weight: weight
+            });
+          },
+          size: _this._layer.options['weight'],
+          label: "Width",
+          type: "number"
+        }), /*#__PURE__*/React.createElement(FeildInput, {
+          onChange: function onChange(opacity) {
+            return _this._layer.setStyle({
+              opacity: opacity
+            });
+          },
+          size: _this._layer.options['opacity'],
+          label: "Opacity",
+          type: "number"
+        }), /*#__PURE__*/React.createElement(Divider, {
+          style: {
+            marginTop: 10,
+            marginBottom: 10
+          }
+        }), /*#__PURE__*/React.createElement(Typography, {
+          variant: "subtitle2",
+          gutterBottom: true
+        }, "Fill"), /*#__PURE__*/React.createElement(ColorPickerPanel$1, {
+          testId: "",
+          onChange: function onChange(fillColor) {
+            return _this._layer.setStyle({
+              fillColor: fillColor
+            });
+          },
+          title: "Color",
+          description: "",
+          color: _this._layer.options['fillColor']
+        }), /*#__PURE__*/React.createElement(FeildInput, {
+          onChange: function onChange(fillOpacity) {
+            return _this._layer.setStyle({
+              fillOpacity: fillOpacity
+            });
+          },
+          size: _this._layer.options['fillOpacity'],
+          label: "Opacity",
+          type: "number"
+        }));
+      };
+
+      ReactDOM.render( /*#__PURE__*/React.createElement(App, null), this._container);
+    }
+  }, {
+    key: "open",
+    value: function open() {
+      this._callback();
+
+      this._layer.editing.enable();
+
+      this._initShapeEditControl(); //this._setEditConfig();
+
+    }
+  }]);
+
+  return ShapeEditor;
+}();
+
+var Editor = /*#__PURE__*/function () {
+  function Editor(container, client) {
+    _classCallCheck(this, Editor);
+
+    this.container = container;
+    this._client = client;
+  }
+
+  _createClass(Editor, [{
+    key: "edit",
+    value: function edit(layer, options, callback) {
+      var shape;
+
+      if (options['type'] == "annotation") {
+        console.log('annotation'); //	shape = MangoGis.init("MangoGis.bookmark.sketch.sketchList.EditAnnotation", this._parentContainer, layer, callback);
+      } else {
+        if (layer instanceof L.Marker) {
+          console.log('marker'); //shape = MangoGis.init("MangoGis.bookmark.sketch.sketchList.EditMarker", this._parentContainer, layer, callback);
+        } else {
+          shape = new ShapeEditor(this.container, layer, callback, this._client);
+        }
+      }
+      /*
+      MangoGis.Event.bind(shape, "shape-updated", this, function() {
+      this._done();					
+      });
+      MangoGis.Event.bind(shape, "remove-sketch", this, function(layer) {
+      this._removeSketch(layer)
+      });
+      MangoGis.Event.bind(shape, "shape-clicked", this, function(layer) {
+      MangoGis.Event.trigger(this, "shape-clicked");
+      });
+      */
+
+
+      return shape;
+    }
+  }, {
+    key: "_done",
+    value: function _done() {//MangoGis.Event.trigger(this, "shape-updated");
+    }
+  }, {
+    key: "_removeSketch",
+    value: function _removeSketch(layer) {//MangoGis.Event.trigger(this, "remove-sketch", layer);
+    }
+  }]);
+
+  return Editor;
+}();
+
 var GeoJsonLayer = /*#__PURE__*/memo(function (props) {
   var fgRef = props.fgRef,
       data = props.data;
+  var editor = new Editor(document.getElementById("sketch-container-".concat(props.data.id)), props.client);
 
   var _rendreGeoJsonLayer = function _rendreGeoJsonLayer(storage) {
     var json = JSON.parse(storage.json);
@@ -2030,8 +2467,6 @@ var GeoJsonLayer = /*#__PURE__*/memo(function (props) {
       var geojsonLayer = L.geoJson(geojson['geojson'], {
         style: geojson['options'],
         pointToLayer: function pointToLayer(feature, latlng) {
-          console.log(feature);
-
           if (feature.properties.radius) {
             return new L.Circle(latlng, feature.properties.radius);
           }
@@ -2051,7 +2486,6 @@ var GeoJsonLayer = /*#__PURE__*/memo(function (props) {
           */
 
 
-          console.log(geojson['options']);
           return L.marker(latlng);
           /*
             , {icon: L.icon({
@@ -2063,7 +2497,12 @@ var GeoJsonLayer = /*#__PURE__*/memo(function (props) {
         }
       });
       geojsonLayer.eachLayer(function (layer) {
-        if (fgRef) fgRef.addLayer(layer);
+        if (fgRef) {
+          fgRef.addLayer(layer);
+          editor.edit(layer, geojson['options'], function () {
+            console.log('editor edited');
+          });
+        }
       });
     });
   };
@@ -2133,12 +2572,12 @@ var FGroup = /*#__PURE__*/function (_React$Component) {
             data = _useQuery.data;
 
         if (data) {
-          // && data.isSketchOpened){
           var activeStorage = _this.props.storages.find(function (storage) {
             return storage.id === data.sketchId;
           });
 
           return /*#__PURE__*/React.createElement(GeoJsonLayer, {
+            client: _this.props.client,
             onUpdated: _this.props.onUpdated,
             expanded: data.isSketchOpened,
             data: activeStorage,
