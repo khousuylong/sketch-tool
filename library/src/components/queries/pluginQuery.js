@@ -7,4 +7,10 @@ const OPEN_SKETCH = gql`
   }
 `;
 
-export {OPEN_SKETCH}
+const EDIT_GEOJSON = gql`
+  query IsEditingGeoJson {
+    isEditingGeoJson @client
+  }
+`;
+
+export {OPEN_SKETCH, EDIT_GEOJSON}

@@ -14,9 +14,9 @@ class FGroup extends React.Component {
   render() {
     const RenderEditControl = () => {
       const { data } = useQuery(OPEN_SKETCH);
-      if(data){// && data.isSketchOpened){
+      if(data){
         const activeStorage = this.props.storages.find(storage => storage.id === data.sketchId)
-        return(<GeoJsonLayer onUpdated={this.props.onUpdated} expanded={data.isSketchOpened} data={activeStorage} fgRef={this._fGref}/>)
+        return(<GeoJsonLayer client={this.props.client} onUpdated={this.props.onUpdated} expanded={data.isSketchOpened} data={activeStorage} fgRef={this._fGref}/>)
       }
       return null;
     }

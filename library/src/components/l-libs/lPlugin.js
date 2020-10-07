@@ -16,7 +16,6 @@ const SketchTool = memo((props) => {
       updateStorage({variables: payload})
     }
     if(data){
-      console.log('this is data', data)
       return(
         <FGroup onUpdated={handleUpdate} client={props.client} pluginId={props.pluginId} storages={data.pluginStorages}/>
       ) 

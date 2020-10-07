@@ -13,11 +13,13 @@
   "author": "",
   "license": "ISC",
   "peerDependencies": {
+    "@apollo/react-hoc": "^4.0.0",
     "@emotion/core": "10.x",
     "@emotion/styled": "10.x",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "@material-ui/core": "^4.11.0",
+		"react-color": "^2.17.3",
     "@material-ui/icons": "^4.9.1",
     "pubsub-js": "^1.9.0",
     "@apollo/client": "^3.1.4",

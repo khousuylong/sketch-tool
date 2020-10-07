@@ -8,7 +8,7 @@ import FormLabel from '@material-ui/core/FormLabel';
 import Button from '@material-ui/core/Button';
 import 'pubsub-js';
 import { UPDATE_PLUGIN_SETTING_MUTATION, PLUGIN_STORAGES_QUERY, UPDATE_PLUGIN_STORAGE_MUTATION, DELETE_PLUGIN_STORAGE_MUTATION, CREATE_PLUGIN_STORAGE_MUTATION } from 'plugin-storage';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles, createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
@@ -33,6 +33,7 @@ import reactCSS from 'reactcss';
 import { CompactPicker } from 'react-color';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import { green, red } from '@material-ui/core/colors';
 
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -2279,15 +2280,22 @@ FeildInput.propTypes = (_FeildInput$propTypes = {
   label: propTypes.string
 }, _defineProperty(_FeildInput$propTypes, "label", propTypes.any.isRequired), _defineProperty(_FeildInput$propTypes, "size", propTypes.number), _FeildInput$propTypes);
 
+var theme = createMuiTheme({
+  palette: {
+    primary: green,
+    secondary: red
+  }
+});
+
 var ShapeEditor = /*#__PURE__*/function () {
-  function ShapeEditor(container, layer, callback, client) {
+  function ShapeEditor(client, layer, options) {
     _classCallCheck(this, ShapeEditor);
 
+    this._options = options;
     this._apolloClient = client;
-    this._container = container;
+    this._container = options.container;
     this._layer = layer;
-    console.log('this is layer', layer);
-    this._callback = callback;
+    this._callBack = options.callBack;
 
     this._initEvents();
   }
@@ -2302,6 +2310,8 @@ var ShapeEditor = /*#__PURE__*/function () {
           self.open();
           window._sketchEditing = true;
         }
+
+        L.DomEvent.stop(e);
         /*
         if(MangoGis.ON_DRAW_CLICKED) return;
         if( !map['is_editing'] ){
@@ -2309,9 +2319,7 @@ var ShapeEditor = /*#__PURE__*/function () {
         map['is_editing'] = true;
         }
         MangoGis.Event.trigger(self, "shape-clicked");
-        L.DomEvent.stop(e);
         */
-
       });
     }
   }, {
@@ -2325,6 +2333,12 @@ var ShapeEditor = /*#__PURE__*/function () {
           isEditingGeoJson: true
         }
       });
+
+      var _done = function _done() {
+        window._sketchEditing = false;
+
+        _this._options.done();
+      };
 
       var App = function App() {
         return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Typography, {
@@ -2385,7 +2399,32 @@ var ShapeEditor = /*#__PURE__*/function () {
           size: _this._layer.options['fillOpacity'],
           label: "Opacity",
           type: "number"
-        }));
+        }), /*#__PURE__*/React.createElement("div", {
+          style: {
+            marginTop: 10,
+            "float": 'right'
+          }
+        }, /*#__PURE__*/React.createElement(ThemeProvider, {
+          theme: theme
+        }, /*#__PURE__*/React.createElement(Button, {
+          style: {
+            color: '#fff',
+            fontWeight: 'bold'
+          },
+          variant: "contained",
+          color: "secondary"
+        }, "Cancel")), /*#__PURE__*/React.createElement(ThemeProvider, {
+          theme: theme
+        }, /*#__PURE__*/React.createElement(Button, {
+          onClick: _done,
+          style: {
+            color: '#fff',
+            fontWeight: 'bold',
+            marginLeft: 5
+          },
+          variant: "contained",
+          color: "primary"
+        }, "Done"))));
       };
 
       ReactDOM.render( /*#__PURE__*/React.createElement(App, null), this._container);
@@ -2393,7 +2432,7 @@ var ShapeEditor = /*#__PURE__*/function () {
   }, {
     key: "open",
     value: function open() {
-      this._callback();
+      this._callBack();
 
       this._layer.editing.enable();
 
@@ -2415,18 +2454,23 @@ var Editor = /*#__PURE__*/function () {
 
   _createClass(Editor, [{
     key: "edit",
-    value: function edit(layer, options, callback) {
+    value: function edit(layer, options) {
       var shape;
+      /*
+      if(options['type'] == "annotation"){
+        console.log('annotation')
+      //	shape = MangoGis.init("MangoGis.bookmark.sketch.sketchList.EditAnnotation", this._parentContainer, layer, callback);
+      }else{
+      */
 
-      if (options['type'] == "annotation") {
-        console.log('annotation'); //	shape = MangoGis.init("MangoGis.bookmark.sketch.sketchList.EditAnnotation", this._parentContainer, layer, callback);
+      if (layer instanceof L.Marker) {
+        console.log('marker'); //shape = MangoGis.init("MangoGis.bookmark.sketch.sketchList.EditMarker", this._parentContainer, layer, callback);
       } else {
-        if (layer instanceof L.Marker) {
-          console.log('marker'); //shape = MangoGis.init("MangoGis.bookmark.sketch.sketchList.EditMarker", this._parentContainer, layer, callback);
-        } else {
-          shape = new ShapeEditor(this.container, layer, callback, this._client);
-        }
-      }
+        shape = new ShapeEditor(this._client, layer, _objectSpread2({
+          container: this.container
+        }, options));
+      } //}
+
       /*
       MangoGis.Event.bind(shape, "shape-updated", this, function() {
       this._done();					
@@ -2499,15 +2543,24 @@ var GeoJsonLayer = /*#__PURE__*/memo(function (props) {
       geojsonLayer.eachLayer(function (layer) {
         if (fgRef) {
           fgRef.addLayer(layer);
-          editor.edit(layer, geojson['options'], function () {
-            console.log('editor edited');
+          editor.edit(layer, {
+            done: _save,
+            callBack: function callBack() {
+              return console.log('this is callback');
+            }
           });
+          /*
+           *geojson['options']
+            , function() {
+            console.log('editor edited')
+          });
+           */
         }
       });
     });
   };
 
-  var _onCreated = function _onCreated(e) {
+  var _save = function _save() {
     var geoJsons = [];
     fgRef.getLayers().map(function (layer) {
       var geoJSON = layer.toGeoJSON();
@@ -2529,6 +2582,10 @@ var GeoJsonLayer = /*#__PURE__*/memo(function (props) {
       json: JSON.stringify(json)
     };
     props.onUpdated(payload);
+  };
+
+  var _onCreated = function _onCreated() {
+    _save();
   };
 
   var _onEditStart = function _onEditStart(e) {
@@ -2619,7 +2676,6 @@ var SketchTool = /*#__PURE__*/memo(function (props) {
     };
 
     if (data) {
-      console.log('this is data', data);
       return /*#__PURE__*/React.createElement(FGroup, {
         onUpdated: handleUpdate,
         client: props.client,

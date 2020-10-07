@@ -6,8 +6,8 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { useMutation } from '@apollo/client'
-import {OPEN_SKETCH} from '../queries/pluginQuery'
+import { useMutation, useQuery } from '@apollo/client'
+import {OPEN_SKETCH, EDIT_GEOJSON} from '../queries/pluginQuery'
 import PubSub from 'pubsub-js'
 import {
   UPDATE_PLUGIN_STORAGE_MUTATION, 
@@ -61,6 +61,14 @@ const Sketch = memo(props => {
     });
   }
 
+  const Editor = () => {
+    const { data } = useQuery(EDIT_GEOJSON);
+    if(data){
+      return(<div></div>)
+    }
+    return(<DeleteSketch />)
+  }
+
   return (
     <Accordion expanded={props.expanded === props.data.id} onChange={handleChanges(props.data.id)}>
       <AccordionSummary
@@ -85,7 +93,8 @@ const Sketch = memo(props => {
         />        
       </AccordionSummary>
       <AccordionDetails>
-        <DeleteSketch />
+        <Editor />
+        <div style={{width: '100%'}} id={`sketch-container-${props.data.id}`}></div>
       </AccordionDetails>
     </Accordion>
   );

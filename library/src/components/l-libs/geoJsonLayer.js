@@ -4,6 +4,7 @@ import EditControl from './editControl'//"react-leaflet-draw"
 import { useQuery, useMutation } from '@apollo/client'
 import L from 'leaflet'
 import {OPEN_SKETCH} from '../queries/pluginQuery'
+import Editor from './editors/editor'
 import {
   PLUGIN_STORAGES_QUERY, 
   UPDATE_PLUGIN_STORAGE_MUTATION
@@ -11,6 +12,7 @@ import {
 
 const GeoJsonLayer = memo((props) => {
   const {fgRef, data} = props;
+  const editor = new Editor(document.getElementById(`sketch-container-${props.data.id}`), props.client)
   const _rendreGeoJsonLayer = storage => {
     const json = JSON.parse(storage.json);
 
@@ -20,7 +22,6 @@ const GeoJsonLayer = memo((props) => {
       const geojsonLayer = 	L.geoJson(geojson['geojson'], {
         style: geojson['options'],
         pointToLayer: function(feature, latlng) {
-          console.log(feature)
           if (feature.properties.radius) {
             return new L.Circle(latlng, feature.properties.radius);
           }
@@ -38,7 +39,6 @@ const GeoJsonLayer = memo((props) => {
             return L.marker(latlng, { icon: icon, type: 'annotation', annotation: geojson['options']['annotation']});
           }
           */
-          console.log(geojson['options'])
           return L.marker(latlng)
           /*
             , {icon: L.icon({
@@ -50,13 +50,22 @@ const GeoJsonLayer = memo((props) => {
         }
       });
       geojsonLayer.eachLayer(function(layer){
-        if(fgRef) fgRef.addLayer(layer);
+        if(fgRef){
+          fgRef.addLayer(layer);
+          editor.edit(layer, {done: _save, callBack: () => console.log('this is callback')} )
+          /*
+           *geojson['options']
+            , function() {
+            console.log('editor edited')
+					});
+           */
+        } 
       });
 
     })
   }
 
-  const _onCreated = e => {
+  const _save = () => {
     const geoJsons = []
     fgRef.getLayers().map(layer => {
       const geoJSON = layer.toGeoJSON()
@@ -80,6 +89,10 @@ const GeoJsonLayer = memo((props) => {
     props.onUpdated(payload)
   }
 
+  const _onCreated = ()  => {
+    _save() 
+  }
+
   const _onEditStart = e => {
     console.log('on edit start', e)
   }
@@ -99,7 +112,5 @@ const GeoJsonLayer = memo((props) => {
       )
     }
   } 
-
-  
 })
 export default GeoJsonLayer
