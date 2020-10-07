@@ -2373,6 +2373,15 @@ var ShapeEditor = /*#__PURE__*/function () {
       this._options.done();
     }
   }, {
+    key: "_cancel",
+    value: function _cancel() {
+      this._updateQueryCache(false);
+
+      window._sketchEditing = false;
+
+      this._layer.editing.disable();
+    }
+  }, {
     key: "_renderForm",
     value: function _renderForm() {
       var _this = this;
@@ -2448,6 +2457,9 @@ var ShapeEditor = /*#__PURE__*/function () {
         }, /*#__PURE__*/React.createElement(ThemeProvider, {
           theme: theme
         }, /*#__PURE__*/React.createElement(Button, {
+          onClick: function onClick() {
+            return _this._cancel();
+          },
           style: {
             color: '#fff',
             fontWeight: 'bold'
@@ -2602,12 +2614,6 @@ var GeoJsonLayer = /*#__PURE__*/memo(function (props) {
               return console.log('this is callback');
             }
           });
-          /*
-           *geojson['options']
-            , function() {
-            console.log('editor edited')
-          });
-           */
         }
       });
     });
@@ -2645,6 +2651,16 @@ var GeoJsonLayer = /*#__PURE__*/memo(function (props) {
     console.log('on edit start', e);
   };
 
+  var _stopEditing = function _stopEditing() {
+    window._sketchEditing = false;
+    props.client.cache.writeQuery({
+      query: EDIT_GEOJSON,
+      data: {
+        isEditingGeoJson: false
+      }
+    });
+  };
+
   if (fgRef) {
     fgRef.clearLayers();
 
@@ -2657,6 +2673,10 @@ var GeoJsonLayer = /*#__PURE__*/memo(function (props) {
         onEditStart: _onEditStart,
         draw: {}
       });
+    } else {
+      _stopEditing();
+
+      return null;
     }
   }
 });

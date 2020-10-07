@@ -3,7 +3,7 @@ import { FeatureGroup  } from 'react-leaflet'
 import EditControl from './editControl'//"react-leaflet-draw"
 import { useQuery, useMutation } from '@apollo/client'
 import L from 'leaflet'
-import {OPEN_SKETCH} from '../queries/pluginQuery'
+import {EDIT_GEOJSON} from '../queries/pluginQuery'
 import Editor from './editors/editor'
 import {
   PLUGIN_STORAGES_QUERY, 
@@ -53,12 +53,6 @@ const GeoJsonLayer = memo((props) => {
         if(fgRef){
           fgRef.addLayer(layer);
           editor.edit(layer, {done: _save, callBack: () => console.log('this is callback')} )
-          /*
-           *geojson['options']
-            , function() {
-            console.log('editor edited')
-					});
-           */
         } 
       });
 
@@ -97,6 +91,16 @@ const GeoJsonLayer = memo((props) => {
     console.log('on edit start', e)
   }
 
+  const _stopEditing = () => {
+    window._sketchEditing = false;
+    props.client.cache.writeQuery({
+      query: EDIT_GEOJSON,
+      data: {
+        isEditingGeoJson: false
+      },
+    });
+  }
+
   if(fgRef){
     fgRef.clearLayers()
     if(props.expanded){
@@ -110,6 +114,9 @@ const GeoJsonLayer = memo((props) => {
           }}
         />
       )
+    }else{
+      _stopEditing();  
+      return null;
     }
   } 
 })

@@ -61,6 +61,12 @@ const ShapeEditor = class{
     this._options.done();
   }
 
+  _cancel(){
+    this._updateQueryCache(false);
+    window._sketchEditing = false;
+		this._layer.editing.disable();
+  }
+
   _renderForm(){
     const {containerId} = this._options;
     const App = () => (  
@@ -79,7 +85,7 @@ const ShapeEditor = class{
         <FeildInput onChange={fillOpacity=>this._layer.setStyle({fillOpacity})} size={this._layer.options['fillOpacity']} label="Opacity" type="number"/>
         <div style={{marginTop: 10, float: 'right'}}>
           <ThemeProvider theme={theme}>
-            <Button style={{color: '#fff', fontWeight: 'bold'}} variant="contained" color="secondary">
+            <Button onClick={()=>this._cancel()} style={{color: '#fff', fontWeight: 'bold'}} variant="contained" color="secondary">
               Cancel
             </Button>
           </ThemeProvider>
