@@ -8,6 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { useMutation, useQuery } from '@apollo/client'
 import {OPEN_SKETCH, EDIT_GEOJSON} from '../queries/pluginQuery'
+import StyleEditor from './styleEditor'
 import PubSub from 'pubsub-js'
 import {
   UPDATE_PLUGIN_STORAGE_MUTATION, 
@@ -63,10 +64,10 @@ const Sketch = memo(props => {
 
   const Editor = () => {
     const { data } = useQuery(EDIT_GEOJSON);
-    if(data){
-      return(<div></div>)
-    }
-    return(<DeleteSketch />)
+    if(data && data.isEditingGeoJson){
+      return(<StyleEditor client={props.client} id={props.data.id} />)
+    }else
+      return(<DeleteSketch />)
   }
 
   return (
@@ -92,9 +93,9 @@ const Sketch = memo(props => {
           }}
         />        
       </AccordionSummary>
-      <AccordionDetails>
+      <AccordionDetails style={{flexFlow: 'column'}}>
+        
         <Editor />
-        <div style={{width: '100%'}} id={`sketch-container-${props.data.id}`}></div>
       </AccordionDetails>
     </Accordion>
   );

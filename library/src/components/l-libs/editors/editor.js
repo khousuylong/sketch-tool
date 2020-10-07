@@ -1,8 +1,8 @@
 import L from 'leaflet'
 import ShapeEditor from './shapeEditor'
 export default class Editor{
-  constructor(container, client){
-    this.container = container;
+  constructor(containerId, client){
+    this.containerId = containerId;
     this._client = client
   }
   edit(layer, options){
@@ -18,7 +18,7 @@ export default class Editor{
         console.log('marker')
 				//shape = MangoGis.init("MangoGis.bookmark.sketch.sketchList.EditMarker", this._parentContainer, layer, callback);
 			}else{
-        shape = new ShapeEditor(this._client, layer, {container: this.container, ...options });
+        shape = new ShapeEditor(this._client, layer, {containerId: this.containerId, ...options });
 			}
 		//}
     /*

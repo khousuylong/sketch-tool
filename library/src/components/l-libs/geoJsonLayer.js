@@ -12,7 +12,7 @@ import {
 
 const GeoJsonLayer = memo((props) => {
   const {fgRef, data} = props;
-  const editor = new Editor(document.getElementById(`sketch-container-${props.data.id}`), props.client)
+  const editor = new Editor(`sketch-container-${props.data.id}`, props.client)
   const _rendreGeoJsonLayer = storage => {
     const json = JSON.parse(storage.json);
 

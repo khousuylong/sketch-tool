@@ -6,7 +6,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import Button from '@material-ui/core/Button';
-import 'pubsub-js';
+import PubSub from 'pubsub-js';
 import { UPDATE_PLUGIN_SETTING_MUTATION, PLUGIN_STORAGES_QUERY, UPDATE_PLUGIN_STORAGE_MUTATION, DELETE_PLUGIN_STORAGE_MUTATION, CREATE_PLUGIN_STORAGE_MUTATION } from 'plugin-storage';
 import { makeStyles, withStyles, createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import Accordion from '@material-ui/core/Accordion';
@@ -396,6 +396,38 @@ function _templateObject() {
 var OPEN_SKETCH = gql(_templateObject());
 var EDIT_GEOJSON = gql(_templateObject2());
 
+var StyleEditor = /*#__PURE__*/function (_React$Component) {
+  _inherits(StyleEditor, _React$Component);
+
+  var _super = _createSuper(StyleEditor);
+
+  function StyleEditor() {
+    _classCallCheck(this, StyleEditor);
+
+    return _super.apply(this, arguments);
+  }
+
+  _createClass(StyleEditor, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      PubSub.publish("style-editor-container-ready");
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var id = this.props.id;
+      return /*#__PURE__*/React.createElement("div", {
+        style: {
+          width: '100%'
+        },
+        id: "sketch-container-".concat(id)
+      });
+    }
+  }]);
+
+  return StyleEditor;
+}(React.Component);
+
 var Sketch = /*#__PURE__*/memo(function (props) {
   var _props$client$readQue = props.client.readQuery({
     query: PLUGIN_STORAGES_QUERY,
@@ -476,11 +508,12 @@ var Sketch = /*#__PURE__*/memo(function (props) {
     var _useQuery = useQuery(EDIT_GEOJSON),
         data = _useQuery.data;
 
-    if (data) {
-      return /*#__PURE__*/React.createElement("div", null);
-    }
-
-    return /*#__PURE__*/React.createElement(DeleteSketch, null);
+    if (data && data.isEditingGeoJson) {
+      return /*#__PURE__*/React.createElement(StyleEditor, {
+        client: props.client,
+        id: props.data.id
+      });
+    } else return /*#__PURE__*/React.createElement(DeleteSketch, null);
   };
 
   return /*#__PURE__*/React.createElement(Accordion, {
@@ -510,12 +543,11 @@ var Sketch = /*#__PURE__*/memo(function (props) {
     InputLabelProps: {
       shrink: true
     }
-  })), /*#__PURE__*/React.createElement(AccordionDetails, null, /*#__PURE__*/React.createElement(Editor, null), /*#__PURE__*/React.createElement("div", {
+  })), /*#__PURE__*/React.createElement(AccordionDetails, {
     style: {
-      width: '100%'
-    },
-    id: "sketch-container-".concat(props.data.id)
-  })));
+      flexFlow: 'column'
+    }
+  }, /*#__PURE__*/React.createElement(Editor, null)));
 });
 
 var useStyles = makeStyles({
@@ -2293,7 +2325,6 @@ var ShapeEditor = /*#__PURE__*/function () {
 
     this._options = options;
     this._apolloClient = client;
-    this._container = options.container;
     this._layer = layer;
     this._callBack = options.callBack;
 
@@ -2323,25 +2354,35 @@ var ShapeEditor = /*#__PURE__*/function () {
       });
     }
   }, {
-    key: "_initShapeEditControl",
-    value: function _initShapeEditControl() {
-      var _this = this;
-
+    key: "_updateQueryCache",
+    value: function _updateQueryCache(isEditing) {
       this._apolloClient.cache.writeQuery({
         query: EDIT_GEOJSON,
         data: {
-          isEditingGeoJson: true
+          isEditingGeoJson: isEditing
         }
       });
+    }
+  }, {
+    key: "_done",
+    value: function _done() {
+      this._updateQueryCache(false);
 
-      var _done = function _done() {
-        window._sketchEditing = false;
+      window._sketchEditing = false;
 
-        _this._options.done();
-      };
+      this._options.done();
+    }
+  }, {
+    key: "_renderForm",
+    value: function _renderForm() {
+      var _this = this;
+
+      var containerId = this._options.containerId;
 
       var App = function App() {
-        return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Typography, {
+        return /*#__PURE__*/React.createElement("div", {
+          ref: _this._myAppRef
+        }, /*#__PURE__*/React.createElement(Typography, {
           variant: "subtitle2",
           gutterBottom: true
         }, "Stroke"), /*#__PURE__*/React.createElement(ColorPickerPanel$1, {
@@ -2416,7 +2457,9 @@ var ShapeEditor = /*#__PURE__*/function () {
         }, "Cancel")), /*#__PURE__*/React.createElement(ThemeProvider, {
           theme: theme
         }, /*#__PURE__*/React.createElement(Button, {
-          onClick: _done,
+          onClick: function onClick() {
+            return _this._done();
+          },
           style: {
             color: '#fff',
             fontWeight: 'bold',
@@ -2427,7 +2470,17 @@ var ShapeEditor = /*#__PURE__*/function () {
         }, "Done"))));
       };
 
-      ReactDOM.render( /*#__PURE__*/React.createElement(App, null), this._container);
+      ReactDOM.render( /*#__PURE__*/React.createElement(App, null), document.getElementById(containerId));
+    }
+  }, {
+    key: "_initShapeEditControl",
+    value: function _initShapeEditControl() {
+      var self = this;
+      PubSub.subscribe("style-editor-container-ready", function (msg, data) {
+        self._renderForm();
+      });
+
+      this._updateQueryCache(true);
     }
   }, {
     key: "open",
@@ -2445,10 +2498,10 @@ var ShapeEditor = /*#__PURE__*/function () {
 }();
 
 var Editor = /*#__PURE__*/function () {
-  function Editor(container, client) {
+  function Editor(containerId, client) {
     _classCallCheck(this, Editor);
 
-    this.container = container;
+    this.containerId = containerId;
     this._client = client;
   }
 
@@ -2467,7 +2520,7 @@ var Editor = /*#__PURE__*/function () {
         console.log('marker'); //shape = MangoGis.init("MangoGis.bookmark.sketch.sketchList.EditMarker", this._parentContainer, layer, callback);
       } else {
         shape = new ShapeEditor(this._client, layer, _objectSpread2({
-          container: this.container
+          containerId: this.containerId
         }, options));
       } //}
 
@@ -2502,7 +2555,7 @@ var Editor = /*#__PURE__*/function () {
 var GeoJsonLayer = /*#__PURE__*/memo(function (props) {
   var fgRef = props.fgRef,
       data = props.data;
-  var editor = new Editor(document.getElementById("sketch-container-".concat(props.data.id)), props.client);
+  var editor = new Editor("sketch-container-".concat(props.data.id), props.client);
 
   var _rendreGeoJsonLayer = function _rendreGeoJsonLayer(storage) {
     var json = JSON.parse(storage.json);

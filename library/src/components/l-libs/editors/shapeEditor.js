@@ -7,6 +7,7 @@ import ColorPickerPanel from './commons/colorPickerPanel'
 import {EDIT_GEOJSON} from '../../queries/pluginQuery'
 import FeildInput from './commons/feildInput'
 import { createMuiTheme, withStyles, makeStyles, ThemeProvider } from '@material-ui/core/styles';
+import PubSub from 'pubsub-js'
 import Button from '@material-ui/core/Button';
 import { green, red } from '@material-ui/core/colors';
 
@@ -21,7 +22,6 @@ const ShapeEditor = class{
   constructor(client, layer, options){
     this._options = options;
     this._apolloClient = client;
-    this._container = options.container; 
 		this._layer = layer;
 		this._callBack = options.callBack;
 		this._initEvents();
@@ -46,22 +46,25 @@ const ShapeEditor = class{
 		});
 	}
 
-  
-
-  _initShapeEditControl(){
+  _updateQueryCache(isEditing){
     this._apolloClient.cache.writeQuery({
       query: EDIT_GEOJSON,
       data: {
-        isEditingGeoJson: true
+        isEditingGeoJson: isEditing
       },
     });
-    
-    const _done = () => {
-      window._sketchEditing = false;
-      this._options.done();
-    }
+  }
+
+  _done(){
+    this._updateQueryCache(false);
+    window._sketchEditing = false;
+    this._options.done();
+  }
+
+  _renderForm(){
+    const {containerId} = this._options;
     const App = () => (  
-      <div>
+      <div ref={this._myAppRef}>
         <Typography variant="subtitle2" gutterBottom>
           Stroke
         </Typography> 
@@ -81,14 +84,23 @@ const ShapeEditor = class{
             </Button>
           </ThemeProvider>
           <ThemeProvider theme={theme}>
-            <Button onClick={_done} style={{color: '#fff', fontWeight: 'bold', marginLeft: 5}} variant="contained" color="primary">
+            <Button onClick={() => this._done()} style={{color: '#fff', fontWeight: 'bold', marginLeft: 5}} variant="contained" color="primary">
               Done
             </Button>
           </ThemeProvider>
         </div>
       </div>
     );
-    ReactDOM.render(<App/>, this._container); 
+    ReactDOM.render(<App />, document.getElementById(containerId)); 
+  }
+  
+
+  _initShapeEditControl(){
+    const self = this;
+    PubSub.subscribe("style-editor-container-ready", function (msg, data) {
+      self._renderForm();
+    });
+    this._updateQueryCache(true);
   }
 
   open() {
