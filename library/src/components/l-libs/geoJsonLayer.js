@@ -5,11 +5,13 @@ import { useQuery, useMutation } from '@apollo/client'
 import L from 'leaflet'
 import {EDIT_GEOJSON} from '../queries/pluginQuery'
 import Editor from './editors/editor'
+import { v4 as uuidv4 } from 'uuid'
 import {
   PLUGIN_STORAGES_QUERY, 
   UPDATE_PLUGIN_STORAGE_MUTATION
 } from 'plugin-storage'
 
+let newlyCreatedId = "";
 const GeoJsonLayer = memo((props) => {
   const {fgRef, data} = props;
   const editor = new Editor(`sketch-container-${props.data.id}`, props.client)
@@ -25,10 +27,9 @@ const GeoJsonLayer = memo((props) => {
           if (feature.properties.radius) {
             return new L.Circle(latlng, feature.properties.radius);
           }
-          /*
           if( geojson['options']['type'] === "annotation"){
             var icon = L.icon({
-              iconUrl: '',
+              iconUrl: '/assets/1PX0.png',
               shadowUrl: '',
               iconSize:     [0, 0],
               shadowSize:   [0, 0], 
@@ -38,7 +39,6 @@ const GeoJsonLayer = memo((props) => {
             });
             return L.marker(latlng, { icon: icon, type: 'annotation', annotation: geojson['options']['annotation']});
           }
-          */
           if(geojson['options']['icon']['options'].hasOwnProperty('iconUrl'))
             return L.marker(latlng, {icon: L.icon({
               iconUrl: geojson['options']['icon']['options']['iconUrl'],
@@ -51,7 +51,7 @@ const GeoJsonLayer = memo((props) => {
       geojsonLayer.eachLayer(function(layer){
         if(fgRef){
           fgRef.addLayer(layer);
-          editor.edit(layer, {done: _save, callBack: () => console.log('this is callback')} )
+          editor.edit(layer, {done: _save, open: newlyCreatedId && (newlyCreatedId === geojson.options.id),callBack: () => console.log('this is callback')} )
         } 
       });
 
@@ -82,7 +82,10 @@ const GeoJsonLayer = memo((props) => {
     props.onUpdated(payload)
   }
 
-  const _onCreated = ()  => {
+  const _onCreated = e  => {
+    const id = uuidv4()
+    e.layer['options']['id'] = id
+    newlyCreatedId = id;
     _save() 
   }
 

@@ -28,7 +28,7 @@ L.Draw.InvisibleMarker = L.Draw.Marker.extend({
 		if (this._map) {
 
 			if(!this._mouseAnnotation){
-				this._mouseAnnotation = L.popup().setContent('this is content').setLatLng(this._map.getCenter());
+				this._mouseAnnotation = L.popup().setContent('Click on map to place annotation').setLatLng(this._map.getCenter());
 			}
 			this._mouseAnnotation.addTo(this._map);
 

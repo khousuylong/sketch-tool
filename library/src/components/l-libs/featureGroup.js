@@ -21,7 +21,12 @@ class FGroup extends React.Component {
       return null;
     }
     return(
-      <FeatureGroup ref={ reactFGref => { if(reactFGref) this._fGref = reactFGref.leafletElement }} >
+      <FeatureGroup ref={ reactFGref => { 
+        if(reactFGref){
+          this._fGref = reactFGref.leafletElement 
+          window._mapRef = this._fGref._map 
+        }
+      }} >
         <RenderEditControl />
       </FeatureGroup>
     )

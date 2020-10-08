@@ -1761,7 +1761,7 @@ L.Draw.InvisibleMarker = L.Draw.Marker.extend({
 
     if (this._map) {
       if (!this._mouseAnnotation) {
-        this._mouseAnnotation = L.popup().setContent('this is content').setLatLng(this._map.getCenter());
+        this._mouseAnnotation = L.popup().setContent('Click on map to place annotation').setLatLng(this._map.getCenter());
       }
 
       this._mouseAnnotation.addTo(this._map);
@@ -2679,6 +2679,187 @@ var MarkerEditor = /*#__PURE__*/function () {
   return MarkerEditor;
 }();
 
+var theme$2 = createMuiTheme({
+  palette: {
+    primary: green,
+    secondary: red
+  }
+});
+
+var AnnotationEditor = /*#__PURE__*/function () {
+  function AnnotationEditor(client, layer, options) {
+    _classCallCheck(this, AnnotationEditor);
+
+    this._map = window._mapRef;
+    this._options = options;
+    this._apolloClient = client;
+    this._layer = layer;
+    this._callBack = options.callBack;
+    if (!this._layer['options']['annotation']) this._layer['options']['annotation'] = {
+      content: "content here"
+    };
+
+    this._editAnnotation();
+
+    if (options.open) this.open();
+
+    this._initEvents();
+  }
+
+  _createClass(AnnotationEditor, [{
+    key: "_editAnnotation",
+    value: function _editAnnotation() {
+      var self = this;
+      this._popup = new L.Popup({
+        closeOnClick: false,
+        closeButton: false,
+        minWidth: 50,
+        maxWidth: 500,
+        maxHeight: 500
+      });
+
+      this._popup.setContent('<div class="redactor-output">' + this._layer['options']['annotation']['content'] + '</div>').setLatLng(this._layer.getLatLng()).addTo(this._map);
+
+      L.DomEvent.addListener(this._popup.getElement(), 'click', function (e) {
+        if (!window._sketchEditing) {
+          self.open();
+          window._sketchEditing = true;
+        }
+
+        L.DomEvent.stop(e);
+      }, this);
+      /*
+      $(this._popup._container).click(function() {
+      if(MangoGis.ON_DRAW_CLICKED) return;
+      if(!map['is_editing']){
+      self.open();
+      MangoGis.Event.trigger(self, "shape-clicked");
+      map['is_editing'] = true;
+      }
+      });
+      this._layer.on('remove', function() {
+      map.removeLayer(self._popup);
+      });
+      this._layer.on("disable-edit", function() {
+      $(self._popup._container).off('click');
+      });
+      */
+    }
+  }, {
+    key: "_initEvents",
+    value: function _initEvents() {
+      var self = this;
+
+      this._layer.on('click', function (e) {
+        if (!window._sketchEditing) {
+          self.open();
+          window._sketchEditing = true;
+        }
+
+        L.DomEvent.stop(e);
+      });
+    }
+  }, {
+    key: "_updateQueryCache",
+    value: function _updateQueryCache(isEditing) {
+      this._apolloClient.cache.writeQuery({
+        query: EDIT_GEOJSON,
+        data: {
+          isEditingGeoJson: isEditing
+        }
+      });
+    }
+  }, {
+    key: "_done",
+    value: function _done() {
+      this._updateQueryCache(false);
+
+      window._sketchEditing = false;
+
+      this._options.done();
+    }
+  }, {
+    key: "_cancel",
+    value: function _cancel() {
+      this._updateQueryCache(false);
+
+      window._sketchEditing = false;
+
+      this._layer.editing.disable();
+    }
+  }, {
+    key: "_renderForm",
+    value: function _renderForm() {
+      var _this = this;
+
+      var containerId = this._options.containerId;
+
+      var App = function App() {
+        return /*#__PURE__*/React.createElement("div", {
+          ref: _this._myAppRef
+        }, /*#__PURE__*/React.createElement(Typography, {
+          variant: "subtitle2",
+          gutterBottom: true
+        }, "Stroke"));
+      };
+
+      ReactDOM.render( /*#__PURE__*/React.createElement(App, null), document.getElementById(containerId));
+    }
+  }, {
+    key: "_initShapeEditControl",
+    value: function _initShapeEditControl() {
+      var self = this;
+      PubSub.subscribe("style-editor-container-ready", function (msg, data) {
+        self._renderForm();
+      });
+
+      this._updateQueryCache(true);
+    }
+    /*
+    open: function() {
+    this._initAnnotationEditControl();
+    this._setAnnotation();
+    this._callback();
+    	this._enableEdit();
+    },
+    */
+
+  }, {
+    key: "_enableEdit",
+    value: function _enableEdit() {
+      var pos = this._map.latLngToLayerPoint(this._popup._latlng);
+
+      L.DomUtil.setPosition(this._popup._wrapper.parentNode, pos);
+      this._draggable = new L.Draggable(this._popup._container, this._popup._wrapper);
+
+      this._draggable.enable();
+
+      var self = this;
+
+      this._draggable.on('dragend', function (e) {
+        var latlng = self._map.layerPointToLatLng(e.target._newPos);
+
+        self._popup.setLatLng(latlng);
+
+        self._layer.setLatLng(latlng);
+      }); //L.DomUtil.addClass(this._popup._container, classes.movingPopup)
+      //$(this._popup._container).addClass("cursor-move");
+
+    }
+  }, {
+    key: "open",
+    value: function open() {
+      this._callBack();
+
+      this._initShapeEditControl();
+
+      this._enableEdit();
+    }
+  }]);
+
+  return AnnotationEditor;
+}();
+
 var Editor = /*#__PURE__*/function () {
   function Editor(containerId, client) {
     _classCallCheck(this, Editor);
@@ -2691,52 +2872,32 @@ var Editor = /*#__PURE__*/function () {
     key: "edit",
     value: function edit(layer, options) {
       var shape;
-      /*
-      if(options['type'] == "annotation"){
-        console.log('annotation')
-      //	shape = MangoGis.init("MangoGis.bookmark.sketch.sketchList.EditAnnotation", this._parentContainer, layer, callback);
-      }else{
-      */
 
-      if (layer instanceof L.Marker) {
-        console.log('marker');
-        shape = new MarkerEditor(this._client, layer, _objectSpread2({
+      if (layer.options['type'] == "annotation") {
+        shape = new AnnotationEditor(this._client, layer, _objectSpread2({
           containerId: this.containerId
         }, options));
       } else {
-        shape = new ShapeEditor(this._client, layer, _objectSpread2({
-          containerId: this.containerId
-        }, options));
-      } //}
-
-      /*
-      MangoGis.Event.bind(shape, "shape-updated", this, function() {
-      this._done();					
-      });
-      MangoGis.Event.bind(shape, "remove-sketch", this, function(layer) {
-      this._removeSketch(layer)
-      });
-      MangoGis.Event.bind(shape, "shape-clicked", this, function(layer) {
-      MangoGis.Event.trigger(this, "shape-clicked");
-      });
-      */
-
+        if (layer instanceof L.Marker) {
+          console.log('marker');
+          shape = new MarkerEditor(this._client, layer, _objectSpread2({
+            containerId: this.containerId
+          }, options));
+        } else {
+          shape = new ShapeEditor(this._client, layer, _objectSpread2({
+            containerId: this.containerId
+          }, options));
+        }
+      }
 
       return shape;
-    }
-  }, {
-    key: "_done",
-    value: function _done() {//MangoGis.Event.trigger(this, "shape-updated");
-    }
-  }, {
-    key: "_removeSketch",
-    value: function _removeSketch(layer) {//MangoGis.Event.trigger(this, "remove-sketch", layer);
     }
   }]);
 
   return Editor;
 }();
 
+var newlyCreatedId = "";
 var GeoJsonLayer = /*#__PURE__*/memo(function (props) {
   var fgRef = props.fgRef,
       data = props.data;
@@ -2752,21 +2913,23 @@ var GeoJsonLayer = /*#__PURE__*/memo(function (props) {
           if (feature.properties.radius) {
             return new L.Circle(latlng, feature.properties.radius);
           }
-          /*
-          if( geojson['options']['type'] === "annotation"){
-            var icon = L.icon({
-              iconUrl: '',
-              shadowUrl: '',
-              iconSize:     [0, 0],
-              shadowSize:   [0, 0], 
-              iconAnchor:   [0, 0], 
-              shadowAnchor: [0, 0], 
-              popupAnchor:  [1, 1]
-            });
-            return L.marker(latlng, { icon: icon, type: 'annotation', annotation: geojson['options']['annotation']});
-          }
-          */
 
+          if (geojson['options']['type'] === "annotation") {
+            var icon = L.icon({
+              iconUrl: '/assets/1PX0.png',
+              shadowUrl: '',
+              iconSize: [0, 0],
+              shadowSize: [0, 0],
+              iconAnchor: [0, 0],
+              shadowAnchor: [0, 0],
+              popupAnchor: [1, 1]
+            });
+            return L.marker(latlng, {
+              icon: icon,
+              type: 'annotation',
+              annotation: geojson['options']['annotation']
+            });
+          }
 
           if (geojson['options']['icon']['options'].hasOwnProperty('iconUrl')) return L.marker(latlng, {
             icon: L.icon({
@@ -2782,6 +2945,7 @@ var GeoJsonLayer = /*#__PURE__*/memo(function (props) {
           fgRef.addLayer(layer);
           editor.edit(layer, {
             done: _save,
+            open: newlyCreatedId && newlyCreatedId === geojson.options.id,
             callBack: function callBack() {
               return console.log('this is callback');
             }
@@ -2815,7 +2979,11 @@ var GeoJsonLayer = /*#__PURE__*/memo(function (props) {
     props.onUpdated(payload);
   };
 
-  var _onCreated = function _onCreated() {
+  var _onCreated = function _onCreated(e) {
+    var id = v4();
+    e.layer['options']['id'] = id;
+    newlyCreatedId = id;
+
     _save();
   };
 
@@ -2892,7 +3060,10 @@ var FGroup = /*#__PURE__*/function (_React$Component) {
 
       return /*#__PURE__*/React.createElement(FeatureGroup, {
         ref: function ref(reactFGref) {
-          if (reactFGref) _this._fGref = reactFGref.leafletElement;
+          if (reactFGref) {
+            _this._fGref = reactFGref.leafletElement;
+            window._mapRef = _this._fGref._map;
+          }
         }
       }, /*#__PURE__*/React.createElement(RenderEditControl, null));
     }
