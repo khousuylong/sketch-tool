@@ -1842,11 +1842,6 @@ L.CustomDrawToolbar = L.DrawToolbar.extend({
   getModeHandlers: function getModeHandlers(map) {
     var annotation = new L.Draw.InvisibleMarker(map, this.options.marker);
     annotation.type = "annotation";
-    var customIcon = L.icon({
-      iconUrl: '/assets/pushpin_symbols/pin-4.png',
-      iconSize: [25, 41],
-      iconAnchor: [12, 41]
-    });
     return [{
       enabled: this.options.polyline,
       handler: new L.Draw.Polyline(map, this.options.polyline),
@@ -1865,9 +1860,7 @@ L.CustomDrawToolbar = L.DrawToolbar.extend({
       title: L.drawLocal.draw.toolbar.buttons.circle
     }, {
       enabled: this.options.marker,
-      handler: new L.Draw.Marker(map, {
-        icon: customIcon
-      }),
+      handler: new L.Draw.Marker(map),
       title: L.drawLocal.draw.toolbar.buttons.marker
     }, {
       enabled: this.options.marker,
@@ -2343,14 +2336,6 @@ var ShapeEditor = /*#__PURE__*/function () {
         }
 
         L.DomEvent.stop(e);
-        /*
-        if(MangoGis.ON_DRAW_CLICKED) return;
-        if( !map['is_editing'] ){
-        self.open();
-        map['is_editing'] = true;
-        }
-        MangoGis.Event.trigger(self, "shape-clicked");
-        */
       });
     }
   }, {
@@ -2449,7 +2434,7 @@ var ShapeEditor = /*#__PURE__*/function () {
           size: _this._layer.options['fillOpacity'],
           label: "Opacity",
           type: "number"
-        }), /*#__PURE__*/React.createElement("div", {
+        }), "\\b", /*#__PURE__*/React.createElement("div", {
           style: {
             marginTop: 10,
             "float": 'right'
@@ -2501,12 +2486,197 @@ var ShapeEditor = /*#__PURE__*/function () {
 
       this._layer.editing.enable();
 
-      this._initShapeEditControl(); //this._setEditConfig();
-
+      this._initShapeEditControl();
     }
   }]);
 
   return ShapeEditor;
+}();
+
+var theme$1 = createMuiTheme({
+  palette: {
+    primary: green,
+    secondary: red
+  }
+});
+var useStyles$1 = makeStyles({
+  smallThumb: {
+    border: '3px solid #ECECEC',
+    cursor: 'pointer',
+    borderRadius: '3px',
+    margin: '0 3px 3px 0',
+    padding: '2px 10px',
+    "float": 'left',
+    transition: 'all 0.06s',
+    '&:hover': {
+      border: '3px solid #B1AFAF'
+    }
+  }
+});
+var markers = ["default-marker.png", "pin-2.png", "pin-3.png", "pin-4.png", "pin-5.png", "pin-6.png", "pin-7.png", "pin-8.png", "pin-9.png", "pin-10.png", "pin-11.png", "pin-12.png", "pin-13.png", "pin-14.png", "pin-15.png", "pin-16.png", "pin-17.png", "pin-18.png", "pin-19.png", "pin-20.png"];
+
+var MarkerEditor = /*#__PURE__*/function () {
+  function MarkerEditor(client, layer, options) {
+    _classCallCheck(this, MarkerEditor);
+
+    this._options = options;
+    this._apolloClient = client;
+    this._layer = layer;
+    this._callBack = options.callBack;
+
+    this._initEvents();
+  }
+
+  _createClass(MarkerEditor, [{
+    key: "_initEvents",
+    value: function _initEvents() {
+      var self = this;
+
+      this._layer.on('click', function (e) {
+        if (!window._sketchEditing) {
+          self.open();
+          window._sketchEditing = true;
+        }
+
+        L.DomEvent.stop(e);
+      });
+    }
+  }, {
+    key: "_updateQueryCache",
+    value: function _updateQueryCache(isEditing) {
+      this._apolloClient.cache.writeQuery({
+        query: EDIT_GEOJSON,
+        data: {
+          isEditingGeoJson: isEditing
+        }
+      });
+    }
+  }, {
+    key: "_done",
+    value: function _done() {
+      this._updateQueryCache(false);
+
+      window._sketchEditing = false;
+
+      this._options.done();
+    }
+  }, {
+    key: "_cancel",
+    value: function _cancel() {
+      this._updateQueryCache(false);
+
+      window._sketchEditing = false;
+
+      this._layer.editing.disable();
+    }
+  }, {
+    key: "_updateMarker",
+    value: function _updateMarker(icon) {
+      var customIcon = L.icon({
+        iconUrl: "//mangomap.com/assets/pushpin_symbols/".concat(icon),
+        iconSize: [25, 41],
+        iconAnchor: [12, 41]
+      });
+
+      this._layer.setIcon(customIcon);
+    }
+  }, {
+    key: "_handleChange",
+    value: function _handleChange(icon) {
+      this._updateMarker(icon);
+    }
+  }, {
+    key: "_renderForm",
+    value: function _renderForm() {
+      var _this = this;
+
+      var containerId = this._options.containerId;
+
+      var RenderIcon = function RenderIcon(props) {
+        var classes = useStyles$1();
+        return /*#__PURE__*/React.createElement("div", {
+          onClick: function onClick() {
+            return _this._handleChange(props.icon);
+          },
+          className: classes.smallThumb
+        }, /*#__PURE__*/React.createElement("img", {
+          src: "//mangomap.com/assets/pushpin_symbols/".concat(props.icon)
+        }));
+      };
+
+      var App = function App() {
+        return /*#__PURE__*/React.createElement("div", {
+          ref: _this._myAppRef
+        }, /*#__PURE__*/React.createElement(Typography, {
+          variant: "subtitle2",
+          gutterBottom: true
+        }, "Stroke"), markers.map(function (marker) {
+          console.log('this is marker', marker);
+          return /*#__PURE__*/React.createElement("div", {
+            style: {
+              "float": 'left'
+            },
+            key: marker
+          }, /*#__PURE__*/React.createElement(RenderIcon, {
+            icon: marker
+          }));
+        }), /*#__PURE__*/React.createElement("div", {
+          style: {
+            marginTop: 10,
+            "float": 'right'
+          }
+        }, /*#__PURE__*/React.createElement(ThemeProvider, {
+          theme: theme$1
+        }, /*#__PURE__*/React.createElement(Button, {
+          onClick: function onClick() {
+            return _this._cancel();
+          },
+          style: {
+            color: '#fff',
+            fontWeight: 'bold'
+          },
+          variant: "contained",
+          color: "secondary"
+        }, "Cancel")), /*#__PURE__*/React.createElement(ThemeProvider, {
+          theme: theme$1
+        }, /*#__PURE__*/React.createElement(Button, {
+          onClick: function onClick() {
+            return _this._done();
+          },
+          style: {
+            color: '#fff',
+            fontWeight: 'bold',
+            marginLeft: 5
+          },
+          variant: "contained",
+          color: "primary"
+        }, "Done"))));
+      };
+
+      ReactDOM.render( /*#__PURE__*/React.createElement(App, null), document.getElementById(containerId));
+    }
+  }, {
+    key: "_initShapeEditControl",
+    value: function _initShapeEditControl() {
+      var self = this;
+      PubSub.subscribe("style-editor-container-ready", function (msg, data) {
+        self._renderForm();
+      });
+
+      this._updateQueryCache(true);
+    }
+  }, {
+    key: "open",
+    value: function open() {
+      this._callBack();
+
+      this._layer.editing.enable();
+
+      this._initShapeEditControl();
+    }
+  }]);
+
+  return MarkerEditor;
 }();
 
 var Editor = /*#__PURE__*/function () {
@@ -2529,7 +2699,10 @@ var Editor = /*#__PURE__*/function () {
       */
 
       if (layer instanceof L.Marker) {
-        console.log('marker'); //shape = MangoGis.init("MangoGis.bookmark.sketch.sketchList.EditMarker", this._parentContainer, layer, callback);
+        console.log('marker');
+        shape = new MarkerEditor(this._client, layer, _objectSpread2({
+          containerId: this.containerId
+        }, options));
       } else {
         shape = new ShapeEditor(this._client, layer, _objectSpread2({
           containerId: this.containerId
@@ -2595,14 +2768,13 @@ var GeoJsonLayer = /*#__PURE__*/memo(function (props) {
           */
 
 
-          return L.marker(latlng);
-          /*
-            , {icon: L.icon({
-            iconUrl: geojson['options']['icon']['options']['iconUrl'],
-            iconSize:     [25, 41], 
-            iconAnchor:   [12, 41]
-          })});
-          */
+          if (geojson['options']['icon']['options'].hasOwnProperty('iconUrl')) return L.marker(latlng, {
+            icon: L.icon({
+              iconUrl: geojson['options']['icon']['options']['iconUrl'],
+              iconSize: [25, 41],
+              iconAnchor: [12, 41]
+            })
+          });else return L.marker(latlng);
         }
       });
       geojsonLayer.eachLayer(function (layer) {

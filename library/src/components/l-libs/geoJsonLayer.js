@@ -39,14 +39,13 @@ const GeoJsonLayer = memo((props) => {
             return L.marker(latlng, { icon: icon, type: 'annotation', annotation: geojson['options']['annotation']});
           }
           */
-          return L.marker(latlng)
-          /*
-            , {icon: L.icon({
-            iconUrl: geojson['options']['icon']['options']['iconUrl'],
-            iconSize:     [25, 41], 
-            iconAnchor:   [12, 41]
-          })});
-          */
+          if(geojson['options']['icon']['options'].hasOwnProperty('iconUrl'))
+            return L.marker(latlng, {icon: L.icon({
+              iconUrl: geojson['options']['icon']['options']['iconUrl'],
+              iconSize:     [25, 41], 
+              iconAnchor:   [12, 41]
+            })});
+          else return L.marker(latlng)
         }
       });
       geojsonLayer.eachLayer(function(layer){

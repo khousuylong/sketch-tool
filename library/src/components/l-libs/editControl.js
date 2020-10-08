@@ -106,12 +106,6 @@ L.CustomDrawToolbar = L.DrawToolbar.extend({
 		var annotation = new L.Draw.InvisibleMarker(map, this.options.marker);
 		annotation.type = "annotation";
 
-		var customIcon = L.icon({
-			iconUrl: '/assets/pushpin_symbols/pin-4.png',
-			iconSize:     [25, 41], 
-			iconAnchor:   [12, 41]
-		});
-
 		return [
 			{
 				enabled: this.options.polyline,
@@ -135,7 +129,7 @@ L.CustomDrawToolbar = L.DrawToolbar.extend({
 			},
 			{
 				enabled: this.options.marker,
-				handler: new L.Draw.Marker(map, {icon: customIcon}),
+				handler: new L.Draw.Marker(map),
 				title: L.drawLocal.draw.toolbar.buttons.marker
 			},
 			{
