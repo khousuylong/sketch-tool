@@ -2728,22 +2728,10 @@ var AnnotationEditor = /*#__PURE__*/function () {
 
         L.DomEvent.stop(e);
       }, this);
-      /*
-      $(this._popup._container).click(function() {
-      if(MangoGis.ON_DRAW_CLICKED) return;
-      if(!map['is_editing']){
-      self.open();
-      MangoGis.Event.trigger(self, "shape-clicked");
-      map['is_editing'] = true;
-      }
+
+      this._layer.on('remove', function () {
+        self._map.removeLayer(self._popup);
       });
-      this._layer.on('remove', function() {
-      map.removeLayer(self._popup);
-      });
-      this._layer.on("disable-edit", function() {
-      $(self._popup._container).off('click');
-      });
-      */
     }
   }, {
     key: "_initEvents",
@@ -2772,6 +2760,10 @@ var AnnotationEditor = /*#__PURE__*/function () {
   }, {
     key: "_done",
     value: function _done() {
+      this._draggable.disable();
+
+      this._layer.editing.disable();
+
       this._updateQueryCache(false);
 
       window._sketchEditing = false;
@@ -2800,7 +2792,46 @@ var AnnotationEditor = /*#__PURE__*/function () {
         }, /*#__PURE__*/React.createElement(Typography, {
           variant: "subtitle2",
           gutterBottom: true
-        }, "Stroke"));
+        }, "Stroke"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(TextField, {
+          onChange: function onChange(e) {
+            return _this._updateText(e.target.value);
+          },
+          id: "outlined-textarea",
+          label: "Multiline Placeholder",
+          placeholder: "Placeholder",
+          multiline: true,
+          variant: "outlined"
+        })), /*#__PURE__*/React.createElement("div", {
+          style: {
+            marginTop: 10,
+            "float": 'right'
+          }
+        }, /*#__PURE__*/React.createElement(ThemeProvider, {
+          theme: theme$2
+        }, /*#__PURE__*/React.createElement(Button, {
+          onClick: function onClick() {
+            return _this._cancel();
+          },
+          style: {
+            color: '#fff',
+            fontWeight: 'bold'
+          },
+          variant: "contained",
+          color: "secondary"
+        }, "Cancel")), /*#__PURE__*/React.createElement(ThemeProvider, {
+          theme: theme$2
+        }, /*#__PURE__*/React.createElement(Button, {
+          onClick: function onClick() {
+            return _this._done();
+          },
+          style: {
+            color: '#fff',
+            fontWeight: 'bold',
+            marginLeft: 5
+          },
+          variant: "contained",
+          color: "primary"
+        }, "Done"))));
       };
 
       ReactDOM.render( /*#__PURE__*/React.createElement(App, null), document.getElementById(containerId));
@@ -2815,15 +2846,15 @@ var AnnotationEditor = /*#__PURE__*/function () {
 
       this._updateQueryCache(true);
     }
-    /*
-    open: function() {
-    this._initAnnotationEditControl();
-    this._setAnnotation();
-    this._callback();
-    	this._enableEdit();
-    },
-    */
+  }, {
+    key: "_updateText",
+    value: function _updateText(value) {
+      this._layer['options']['annotation'] = {
+        'content': value
+      };
 
+      this._popup.setContent("<div class=\"redactor-output\">".concat(value, "</div>"));
+    }
   }, {
     key: "_enableEdit",
     value: function _enableEdit() {
