@@ -87,7 +87,7 @@ const AnnotationEditor = class{
     this._updateQueryCache(false);
     window._sketchEditing = false;
 		this._layer.editing.disable();
-    this._popup._container.style.cursor = "none";
+    this._popup._container.style.cursor = "auto";
   }
 
   _renderForm(){

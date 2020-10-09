@@ -101,7 +101,6 @@ const MarkerEditor = class{
         </Typography> 
         {
           markers.map(marker=>{
-            console.log('this is marker', marker)
             return(<div style={{float: 'left'}} key={marker}>
               <RenderIcon icon={marker} />
             </div>)

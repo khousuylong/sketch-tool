@@ -16,7 +16,7 @@ class FGroup extends React.Component {
       const { data } = useQuery(OPEN_SKETCH);
       if(data){
         const activeStorage = this.props.storages.find(storage => storage.id === data.sketchId)
-        return(<GeoJsonLayer client={this.props.client} onUpdated={this.props.onUpdated} expanded={data.isSketchOpened} data={activeStorage} fgRef={this._fGref}/>)
+        if(activeStorage) return(<GeoJsonLayer client={this.props.client} onUpdated={this.props.onUpdated} expanded={data.isSketchOpened} data={activeStorage} fgRef={this._fGref}/>)
       }
       return null;
     }

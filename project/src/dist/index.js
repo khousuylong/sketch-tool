@@ -2611,7 +2611,6 @@ var MarkerEditor = /*#__PURE__*/function () {
           variant: "subtitle2",
           gutterBottom: true
         }, "Stroke"), markers.map(function (marker) {
-          console.log('this is marker', marker);
           return /*#__PURE__*/React.createElement("div", {
             style: {
               "float": 'left'
@@ -2775,7 +2774,7 @@ var AnnotationEditor = /*#__PURE__*/function () {
 
       this._layer.editing.disable();
 
-      this._popup._container.style.cursor = "none";
+      this._popup._container.style.cursor = "auto";
     }
   }, {
     key: "_renderForm",
@@ -3072,7 +3071,7 @@ var FGroup = /*#__PURE__*/function (_React$Component) {
             return storage.id === data.sketchId;
           });
 
-          return /*#__PURE__*/React.createElement(GeoJsonLayer, {
+          if (activeStorage) return /*#__PURE__*/React.createElement(GeoJsonLayer, {
             client: _this.props.client,
             onUpdated: _this.props.onUpdated,
             expanded: data.isSketchOpened,
