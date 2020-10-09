@@ -2434,7 +2434,7 @@ var ShapeEditor = /*#__PURE__*/function () {
           size: _this._layer.options['fillOpacity'],
           label: "Opacity",
           type: "number"
-        }), "\\b", /*#__PURE__*/React.createElement("div", {
+        }), /*#__PURE__*/React.createElement("div", {
           style: {
             marginTop: 10,
             "float": 'right'
@@ -2760,24 +2760,22 @@ var AnnotationEditor = /*#__PURE__*/function () {
   }, {
     key: "_done",
     value: function _done() {
-      this._draggable.disable();
-
-      this._layer.editing.disable();
-
-      this._updateQueryCache(false);
-
-      window._sketchEditing = false;
+      this._cancel();
 
       this._options.done();
     }
   }, {
     key: "_cancel",
     value: function _cancel() {
+      this._draggable.disable();
+
       this._updateQueryCache(false);
 
       window._sketchEditing = false;
 
       this._layer.editing.disable();
+
+      this._popup._container.style.cursor = "none";
     }
   }, {
     key: "_renderForm",
@@ -2789,15 +2787,13 @@ var AnnotationEditor = /*#__PURE__*/function () {
       var App = function App() {
         return /*#__PURE__*/React.createElement("div", {
           ref: _this._myAppRef
-        }, /*#__PURE__*/React.createElement(Typography, {
-          variant: "subtitle2",
-          gutterBottom: true
-        }, "Stroke"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(TextField, {
+        }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(TextField, {
           onChange: function onChange(e) {
             return _this._updateText(e.target.value);
           },
           id: "outlined-textarea",
-          label: "Multiline Placeholder",
+          defaultValue: _this._layer['options']['annotation'].content,
+          label: "Annotation",
           placeholder: "Placeholder",
           multiline: true,
           variant: "outlined"
@@ -2873,9 +2869,9 @@ var AnnotationEditor = /*#__PURE__*/function () {
         self._popup.setLatLng(latlng);
 
         self._layer.setLatLng(latlng);
-      }); //L.DomUtil.addClass(this._popup._container, classes.movingPopup)
-      //$(this._popup._container).addClass("cursor-move");
+      });
 
+      this._popup._container.style.cursor = "move";
     }
   }, {
     key: "open",
@@ -2910,7 +2906,6 @@ var Editor = /*#__PURE__*/function () {
         }, options));
       } else {
         if (layer instanceof L.Marker) {
-          console.log('marker');
           shape = new MarkerEditor(this._client, layer, _objectSpread2({
             containerId: this.containerId
           }, options));

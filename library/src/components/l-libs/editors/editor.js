@@ -13,7 +13,6 @@ export default class Editor{
 			  shape = new AnnotationEditor(this._client, layer, {containerId: this.containerId, ...options })
 		}else{
 			if( layer instanceof L.Marker ){
-        console.log('marker')
 				shape = new MarkerEditor(this._client, layer, {containerId: this.containerId, ...options }); 
 			}else{
         shape = new ShapeEditor(this._client, layer, {containerId: this.containerId, ...options });

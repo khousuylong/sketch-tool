@@ -8,6 +8,7 @@ import { createMuiTheme, makeStyles, ThemeProvider } from '@material-ui/core/sty
 import PubSub from 'pubsub-js'
 import Button from '@material-ui/core/Button';
 import { green, red } from '@material-ui/core/colors';
+import TextField from '@material-ui/core/TextField';
 
 const theme = createMuiTheme({
   palette: {
@@ -50,24 +51,10 @@ const AnnotationEditor = class{
 			L.DomEvent.stop(e);
     }, this);
 
-    /*
-		$(this._popup._container).click(function() {
-			if(MangoGis.ON_DRAW_CLICKED) return;
-			if(!map['is_editing']){
-				self.open();
-				MangoGis.Event.trigger(self, "shape-clicked");
-				map['is_editing'] = true;
-			}
-		});
 
-		this._layer.on('remove', function() {
-			map.removeLayer(self._popup);
+    this._layer.on('remove', function() {
+			self._map.removeLayer(self._popup);
 		});
-
-		this._layer.on("disable-edit", function() {
-			$(self._popup._container).off('click');
-		});
-    */
 	}
 
 	_initEvents() {
@@ -91,24 +78,45 @@ const AnnotationEditor = class{
   }
 
   _done(){
-    this._updateQueryCache(false);
-    window._sketchEditing = false;
+    this._cancel(); 
     this._options.done();
   }
 
   _cancel(){
+    this._draggable.disable();
     this._updateQueryCache(false);
     window._sketchEditing = false;
 		this._layer.editing.disable();
+    this._popup._container.style.cursor = "none";
   }
 
   _renderForm(){
     const {containerId} = this._options;
     const App = () => (  
       <div ref={this._myAppRef}>
-        <Typography variant="subtitle2" gutterBottom>
-          Stroke
-        </Typography> 
+        <div>
+          <TextField
+            onChange={e => this._updateText(e.target.value) }
+            id="outlined-textarea"
+            defaultValue={this._layer['options']['annotation'].content}
+            label="Annotation"
+            placeholder="Placeholder"
+            multiline
+            variant="outlined"
+          />
+        </div>
+        <div style={{marginTop: 10, float: 'right'}}>
+          <ThemeProvider theme={theme}>
+            <Button onClick={()=>this._cancel()} style={{color: '#fff', fontWeight: 'bold'}} variant="contained" color="secondary">
+              Cancel
+            </Button>
+          </ThemeProvider>
+          <ThemeProvider theme={theme}>
+            <Button onClick={() => this._done()} style={{color: '#fff', fontWeight: 'bold', marginLeft: 5}} variant="contained" color="primary">
+              Done
+            </Button>
+          </ThemeProvider>
+        </div>
       </div>
     );
     ReactDOM.render(<App />, document.getElementById(containerId)); 
@@ -123,15 +131,13 @@ const AnnotationEditor = class{
     this._updateQueryCache(true);
   }
 
-  /*
-  open: function() {
-		this._initAnnotationEditControl();
-		this._setAnnotation();
-		this._callback();
+  _updateText(value) {
+		this._layer['options']['annotation'] = {
+			'content': value 
+		};
+		this._popup.setContent(`<div class="redactor-output">${value}</div>`);
+	}
 
-		this._enableEdit();
-	},
-  */
   _enableEdit() {
 		var pos = this._map.latLngToLayerPoint(this._popup._latlng);
 		L.DomUtil.setPosition(this._popup._wrapper.parentNode, pos);
@@ -145,9 +151,7 @@ const AnnotationEditor = class{
 			self._popup.setLatLng(latlng);
 			self._layer.setLatLng(latlng);
 		});
-
-    //L.DomUtil.addClass(this._popup._container, classes.movingPopup)
-		//$(this._popup._container).addClass("cursor-move");
+    this._popup._container.style.cursor = "move";
 	}
 
   open() {

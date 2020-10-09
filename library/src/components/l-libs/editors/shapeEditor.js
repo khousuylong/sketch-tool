@@ -75,7 +75,7 @@ const ShapeEditor = class{
         </Typography> 
         <ColorPickerPanel testId='' onChange={fillColor=>this._layer.setStyle({fillColor})} title='Color' description="" color={this._layer.options['fillColor']}/> 
         <FeildInput onChange={fillOpacity=>this._layer.setStyle({fillOpacity})} size={this._layer.options['fillOpacity']} label="Opacity" type="number"/>
-        \b<div style={{marginTop: 10, float: 'right'}}>
+        <div style={{marginTop: 10, float: 'right'}}>
           <ThemeProvider theme={theme}>
             <Button onClick={()=>this._cancel()} style={{color: '#fff', fontWeight: 'bold'}} variant="contained" color="secondary">
               Cancel
