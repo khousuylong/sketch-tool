@@ -564,7 +564,7 @@ var useStyles = makeStyles({
     width: '100%'
   }
 });
-function ClientView(props) {
+function AccordionView(props) {
   var classes = useStyles();
 
   var _React$useState = React.useState(false),
@@ -647,13 +647,20 @@ function ClientView(props) {
     }, "Create sketch");
   };
 
-  return /*#__PURE__*/React.createElement(ApolloProvider, {
-    client: props.client
-  }, /*#__PURE__*/React.createElement("div", {
+  return /*#__PURE__*/React.createElement("div", {
     className: classes.root
   }, /*#__PURE__*/React.createElement("div", {
     className: classes.centerItem
-  }, /*#__PURE__*/React.createElement(NewSketch, null)), /*#__PURE__*/React.createElement(RenderSketches, null)));
+  }, /*#__PURE__*/React.createElement(NewSketch, null)), /*#__PURE__*/React.createElement(RenderSketches, null));
+}
+function ClientView(props) {
+  return /*#__PURE__*/React.createElement(ApolloProvider, {
+    client: props.client
+  }, /*#__PURE__*/React.createElement(AccordionView, {
+    client: props.client,
+    pluginId: props.pluginId,
+    settingId: props.settingId
+  }));
 }
 
 function createCommonjsModule(fn, basedir, module) {
@@ -3135,4 +3142,4 @@ var LControl = /*#__PURE__*/memo(function (props) {
   }, /*#__PURE__*/React.createElement(RenderFGroup, null));
 });
 
-export { AdminSetting, ClientView, LControl };
+export { ClientView as AccordionView, AdminSetting, ClientView, LControl };

@@ -8,7 +8,7 @@ import {
 
 import { MockedProvider } from "@apollo/client/testing";
 
-import {Client} from '../dist/index'
+import {AccordionView} from '../dist/index'
 import {
   render,
   fireEvent,
@@ -61,7 +61,7 @@ describe('Render Sketch tool', () => {
         },
       }
     ]
-    const component = render(<MockedProvider mocks={mocks} addTypename={false}><Client client={client} pluginId="869a172a-1026-458d-8c6b-89590d16b5d5" settingId="b67635cc-cb47-4aaf-b37b-42e470acfef3"/></MockedProvider>);
+    const component = render(<MockedProvider mocks={mocks} addTypename={false}><AccordionView client={client} pluginId="869a172a-1026-458d-8c6b-89590d16b5d5" settingId="b67635cc-cb47-4aaf-b37b-42e470acfef3"/></MockedProvider>);
     const createSketch = component.getByText('Create sketch') 
     expect(createSketch).toBeInTheDocument()
 
