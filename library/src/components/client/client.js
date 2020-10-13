@@ -33,7 +33,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function ActionsInAccordionSummary(props) {
+export default function ClientView(props) {
   const classes = useStyles();
 
   const [expanded, setExpanded] = React.useState(false);
@@ -48,6 +48,7 @@ export default function ActionsInAccordionSummary(props) {
       variables: { pluginId: props.pluginId}
     })
 
+      console.log('here is the storage', data)
     if(data){
       pluginStorages = data.pluginStorages;
       return(

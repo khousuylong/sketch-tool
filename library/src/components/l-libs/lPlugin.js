@@ -6,7 +6,7 @@ import {
 } from 'plugin-storage'
 import FGroup from './featureGroup'
 
-const SketchTool = memo((props) => {
+const LControl = memo((props) => {
   const RenderFGroup = () => {
     const [updateStorage] = useMutation(UPDATE_PLUGIN_STORAGE_MUTATION);
     const {data} = useQuery(PLUGIN_STORAGES_QUERY, {
@@ -28,4 +28,4 @@ const SketchTool = memo((props) => {
     </ApolloProvider>
   )
 })
-export default SketchTool
+export default LControl

@@ -564,7 +564,7 @@ var useStyles = makeStyles({
     width: '100%'
   }
 });
-function ActionsInAccordionSummary(props) {
+function ClientView(props) {
   var classes = useStyles();
 
   var _React$useState = React.useState(false),
@@ -585,6 +585,8 @@ function ActionsInAccordionSummary(props) {
       }
     }),
         data = _useQuery.data;
+
+    console.log('here is the storage', data);
 
     if (data) {
       pluginStorages = data.pluginStorages;
@@ -3097,7 +3099,7 @@ var FGroup = /*#__PURE__*/function (_React$Component) {
   return FGroup;
 }(React.Component);
 
-var SketchTool = /*#__PURE__*/memo(function (props) {
+var LControl = /*#__PURE__*/memo(function (props) {
   var RenderFGroup = function RenderFGroup() {
     var _useMutation = useMutation(UPDATE_PLUGIN_STORAGE_MUTATION),
         _useMutation2 = _slicedToArray(_useMutation, 1),
@@ -3133,4 +3135,4 @@ var SketchTool = /*#__PURE__*/memo(function (props) {
   }, /*#__PURE__*/React.createElement(RenderFGroup, null));
 });
 
-export { AdminSetting, ActionsInAccordionSummary as Client, SketchTool };
+export { AdminSetting, ClientView, LControl };

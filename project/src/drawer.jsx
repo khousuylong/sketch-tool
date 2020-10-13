@@ -1,7 +1,7 @@
 import React from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import clsx from 'clsx'
-import {Client} from './dist/index'
+import {ClientView} from './dist/index'
 import SwipeableDrawer from '@material-ui/core/SwipeableDrawer'
 import Button from '@material-ui/core/Button'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft' 
@@ -49,7 +49,7 @@ const SwipeableTemporaryDrawer = function(props) {
       className={clsx(classes.list)}
       role="presentation"
     >
-			<Client client={props.client} pluginId="869a172a-1026-458d-8c6b-89590d16b5d5" settingId="b67635cc-cb47-4aaf-b37b-42e470acfef3"/>
+			<ClientView client={props.client} pluginId="869a172a-1026-458d-8c6b-89590d16b5d5" settingId="b67635cc-cb47-4aaf-b37b-42e470acfef3"/>
     </div>
   );
 	
@@ -68,7 +68,7 @@ const SwipeableTemporaryDrawer = function(props) {
 				>
 					<div className={classes.drawerPoint}>
 					{
-						state[anchor] ? <ChevronLeftIcon onClick={toggleDrawer(anchor, false)}/> : <ChevronRightIcon onClick={toggleDrawer(anchor, true)}/> 
+						state[anchor] ? <ChevronLeftIcon data-testid="drawer-left" onClick={toggleDrawer(anchor, false)}/> : <ChevronRightIcon data-testid="drawer-right" onClick={toggleDrawer(anchor, true)}/> 
 					}
 					</div>
 					{list(anchor)}
