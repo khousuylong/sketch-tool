@@ -542,7 +542,7 @@ var Sketch = /*#__PURE__*/memo(function (props) {
     fullWidth: true,
     margin: "normal",
     inputProps: {
-      'data-testid': 'sketch-title'
+      'data-testid': props.data.id
     },
     InputLabelProps: {
       shrink: true
@@ -590,8 +590,6 @@ function AccordionView(props) {
       }
     }),
         data = _useQuery.data;
-
-    console.log('here is the storage', data);
 
     if (data) {
       pluginStorages = data.pluginStorages;

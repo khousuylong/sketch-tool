@@ -90,7 +90,7 @@ const Sketch = memo(props => {
           fullWidth
           margin="normal"
           inputProps={{
-            'data-testid': 'sketch-title'
+            'data-testid': props.data.id
           }}
           InputLabelProps={{
             shrink: true,

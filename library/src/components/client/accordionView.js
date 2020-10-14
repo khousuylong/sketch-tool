@@ -47,8 +47,6 @@ export default function AccordionView(props) {
     const {data} = useQuery(PLUGIN_STORAGES_QUERY, {
       variables: { pluginId: props.pluginId}
     })
-
-      console.log('here is the storage', data)
     if(data){
       pluginStorages = data.pluginStorages;
       return(
