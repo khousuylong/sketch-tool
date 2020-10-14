@@ -10,6 +10,7 @@ import { useMutation, useQuery } from '@apollo/client'
 import {OPEN_SKETCH, EDIT_GEOJSON} from '../queries/pluginQuery'
 import StyleEditor from './styleEditor'
 import PubSub from 'pubsub-js'
+import {useApolloClient} from '@apollo/client'
 import {
   UPDATE_PLUGIN_STORAGE_MUTATION, 
   DELETE_PLUGIN_STORAGE_MUTATION, 
@@ -18,8 +19,8 @@ import {
 
   
 const Sketch = memo(props => {
-
-  const {pluginStorages} = props.client.readQuery({query: PLUGIN_STORAGES_QUERY, variables: { pluginId: props.data.pluginId}})
+  const apolloClient = useApolloClient()
+  const {pluginStorages} = apolloClient.readQuery({query: PLUGIN_STORAGES_QUERY, variables: { pluginId: props.data.pluginId}})
   const [updateStorage, {data}] = useMutation(UPDATE_PLUGIN_STORAGE_MUTATION);
   const json = JSON.parse(props.data.json)
 
@@ -36,7 +37,7 @@ const Sketch = memo(props => {
   const DeleteSketch = () => {
 		const [deleteSketch, {data}] = useMutation(DELETE_PLUGIN_STORAGE_MUTATION);
     if(data){
-      props.client.writeQuery({
+      apolloClient.writeQuery({
         query: PLUGIN_STORAGES_QUERY,
         variables: {pluginId: props.data.pluginId},
         data: {
@@ -53,7 +54,7 @@ const Sketch = memo(props => {
 
   const handleChanges = (panel) => (evt, expanded) => {
     props.onChange(panel, expanded)
-    props.client.cache.writeQuery({
+    apolloClient.cache.writeQuery({
       query: OPEN_SKETCH,
       data: {
         isSketchOpened: expanded,
@@ -65,7 +66,7 @@ const Sketch = memo(props => {
   const Editor = () => {
     const { data } = useQuery(EDIT_GEOJSON);
     if(data && data.isEditingGeoJson){
-      return(<StyleEditor client={props.client} id={props.data.id} />)
+      return(<StyleEditor id={props.data.id} />)
     }else
       return(<DeleteSketch />)
   }
@@ -88,6 +89,9 @@ const Sketch = memo(props => {
           placeholder="Placeholder"
           fullWidth
           margin="normal"
+          inputProps={{
+            'data-testid': 'sketch-title'
+          }}
           InputLabelProps={{
             shrink: true,
           }}

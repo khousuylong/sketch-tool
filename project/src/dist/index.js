@@ -1,5 +1,5 @@
 import React, { memo, Component } from 'react';
-import { ApolloProvider, useMutation, useQuery } from '@apollo/client';
+import { ApolloProvider, useMutation, useApolloClient, useQuery } from '@apollo/client';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -429,13 +429,15 @@ var StyleEditor = /*#__PURE__*/function (_React$Component) {
 }(React.Component);
 
 var Sketch = /*#__PURE__*/memo(function (props) {
-  var _props$client$readQue = props.client.readQuery({
+  var apolloClient = useApolloClient();
+
+  var _apolloClient$readQue = apolloClient.readQuery({
     query: PLUGIN_STORAGES_QUERY,
     variables: {
       pluginId: props.data.pluginId
     }
   }),
-      pluginStorages = _props$client$readQue.pluginStorages;
+      pluginStorages = _apolloClient$readQue.pluginStorages;
 
   var _useMutation = useMutation(UPDATE_PLUGIN_STORAGE_MUTATION),
       _useMutation2 = _slicedToArray(_useMutation, 2),
@@ -466,7 +468,7 @@ var Sketch = /*#__PURE__*/memo(function (props) {
         data = _useMutation4[1].data;
 
     if (data) {
-      props.client.writeQuery({
+      apolloClient.writeQuery({
         query: PLUGIN_STORAGES_QUERY,
         variables: {
           pluginId: props.data.pluginId
@@ -494,7 +496,7 @@ var Sketch = /*#__PURE__*/memo(function (props) {
   var handleChanges = function handleChanges(panel) {
     return function (evt, expanded) {
       props.onChange(panel, expanded);
-      props.client.cache.writeQuery({
+      apolloClient.cache.writeQuery({
         query: OPEN_SKETCH,
         data: {
           isSketchOpened: expanded,
@@ -510,7 +512,6 @@ var Sketch = /*#__PURE__*/memo(function (props) {
 
     if (data && data.isEditingGeoJson) {
       return /*#__PURE__*/React.createElement(StyleEditor, {
-        client: props.client,
         id: props.data.id
       });
     } else return /*#__PURE__*/React.createElement(DeleteSketch, null);
@@ -540,6 +541,9 @@ var Sketch = /*#__PURE__*/memo(function (props) {
     placeholder: "Placeholder",
     fullWidth: true,
     margin: "normal",
+    inputProps: {
+      'data-testid': 'sketch-title'
+    },
     InputLabelProps: {
       shrink: true
     }
@@ -565,6 +569,7 @@ var useStyles = makeStyles({
   }
 });
 function AccordionView(props) {
+  var apolloClient = useApolloClient();
   var classes = useStyles();
 
   var _React$useState = React.useState(false),
@@ -598,7 +603,6 @@ function AccordionView(props) {
         return /*#__PURE__*/React.createElement(Sketch, {
           expanded: expanded,
           onChange: handleChange,
-          client: props.client,
           key: storage.id,
           data: storage
         });
@@ -615,7 +619,7 @@ function AccordionView(props) {
         data = _useMutation2[1].data;
 
     if (data) {
-      props.client.writeQuery({
+      apolloClient.writeQuery({
         query: PLUGIN_STORAGES_QUERY,
         variables: {
           pluginId: props.pluginId
@@ -653,14 +657,11 @@ function AccordionView(props) {
     className: classes.centerItem
   }, /*#__PURE__*/React.createElement(NewSketch, null)), /*#__PURE__*/React.createElement(RenderSketches, null));
 }
+
 function ClientView(props) {
   return /*#__PURE__*/React.createElement(ApolloProvider, {
     client: props.client
-  }, /*#__PURE__*/React.createElement(AccordionView, {
-    client: props.client,
-    pluginId: props.pluginId,
-    settingId: props.settingId
-  }));
+  }, /*#__PURE__*/React.createElement(AccordionView, props));
 }
 
 function createCommonjsModule(fn, basedir, module) {
@@ -3142,4 +3143,4 @@ var LControl = /*#__PURE__*/memo(function (props) {
   }, /*#__PURE__*/React.createElement(RenderFGroup, null));
 });
 
-export { ClientView as AccordionView, AdminSetting, ClientView, LControl };
+export { AccordionView, AdminSetting, ClientView, LControl };

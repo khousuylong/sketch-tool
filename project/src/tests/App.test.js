@@ -65,7 +65,7 @@ describe('Render Sketch tool', () => {
     const createSketch = component.getByText('Create sketch') 
     expect(createSketch).toBeInTheDocument()
 
-    expect(await waitForElement(() => component.getAllByText('Add to map').length)).toBeGreaterThan(1);
+    expect(await waitForElement(() => component.getAllByTestId('sketch-title').length)).toEqual(1);
 
     //fireEvent.click(createSketch)
   });
