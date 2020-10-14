@@ -15,7 +15,6 @@ import {
   UPDATE_PLUGIN_STORAGE_MUTATION,
 } from 'plugin-storage'
 import { ApolloProvider, useMutation, useQuery, useApolloClient } from '@apollo/client'
-import { v4 as uuidv4 } from 'uuid';
 import Sketch from './sketch';
 
 const useStyles = makeStyles({
@@ -86,7 +85,7 @@ export default function AccordionView(props) {
           'geoJson': '' 
         }
         createStorage({
-          variables: { input: {id: uuidv4(), pluginId: props.pluginId, json: JSON.stringify(jsonPayload) }}
+          variables: { input: {pluginId: props.pluginId, json: JSON.stringify(jsonPayload) }}
         })
       }}>Create sketch</Button>
     ) 

@@ -16,7 +16,6 @@ import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { v4 } from 'uuid';
 import gql from 'graphql-tag';
 import { withLeaflet, MapControl, FeatureGroup } from 'react-leaflet';
 import 'react-leaflet-draw';
@@ -34,6 +33,7 @@ import { CompactPicker } from 'react-color';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import { green, red } from '@material-ui/core/colors';
+import { v4 } from 'uuid';
 
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -641,7 +641,6 @@ function AccordionView(props) {
         createStorage({
           variables: {
             input: {
-              id: v4(),
               pluginId: props.pluginId,
               json: JSON.stringify(jsonPayload)
             }
