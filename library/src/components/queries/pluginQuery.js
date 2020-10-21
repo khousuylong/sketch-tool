@@ -1,4 +1,4 @@
-import gql from 'graphql-tag';
+import {gql} from '@apollo/client';
 
 const OPEN_SKETCH = gql`
   query IsSketchOpened {

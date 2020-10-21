@@ -36,6 +36,11 @@
       "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
       "json": "{\"name\":\"Untitled sketch\",\"description\":\"\",\"geoJson\":\"\"}",
       "id": "AbetHnu"
+    },
+    {
+      "pluginId": "869a172a-1026-458d-8c6b-89590d16b5d5",
+      "json": "{\"name\":\"Untitled sketch\",\"description\":\"\",\"geoJson\":[{\"options\":{\"radius\":2151.7171027743034,\"fill\":true,\"stroke\":true,\"color\":\"#000000\",\"weight\":4,\"opacity\":0.5,\"lineCap\":\"round\",\"lineJoin\":\"round\",\"dashArray\":null,\"dashOffset\":null,\"fillColor\":null,\"fillOpacity\":0.2,\"fillRule\":\"evenodd\",\"interactive\":true,\"bubblingMouseEvents\":true,\"pane\":\"overlayPane\",\"attribution\":null,\"clickable\":true,\"id\":\"2709c698-8593-41b7-851a-32a8bb25fcbb\"},\"geojson\":{\"type\":\"Feature\",\"properties\":{\"radius\":2151.7171027743034,\"type\":\"circle\"},\"geometry\":{\"type\":\"Point\",\"coordinates\":[-0.096817,51.513016]}}}]}",
+      "id": "-0SSdQZ"
     }
   ]
 }

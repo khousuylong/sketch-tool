@@ -1,5 +1,5 @@
 import React, { memo, Component } from 'react';
-import { ApolloProvider, useMutation, useApolloClient, useQuery } from '@apollo/client';
+import { ApolloProvider, useMutation, gql, useApolloClient, useQuery } from '@apollo/client';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -16,7 +16,6 @@ import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import gql from 'graphql-tag';
 import { withLeaflet, MapControl, FeatureGroup } from 'react-leaflet';
 import 'react-leaflet-draw';
 import L, { Map } from 'leaflet';
